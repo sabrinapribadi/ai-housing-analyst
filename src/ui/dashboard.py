@@ -1054,7 +1054,11 @@ elif page == "Sentiment Analysis":
 
     st.markdown("---")
     st.subheader("Sample Reviews")
-    st.caption("Non-English reviews are automatically translated. Expand to see the original.")
+    st.caption(
+        "Scores are TextBlob polarity (−1 to +1). "
+        "Positive > 0.1 · Neutral −0.1 to 0.1 · Negative < −0.1. "
+        "Non-English reviews are auto-translated before scoring — expand a card to see the original."
+    )
     tab_pos, tab_neg = st.tabs(["Most Positive", "Most Negative"])
 
     def _render_review(row, positive: bool) -> None:
@@ -1085,6 +1089,19 @@ elif page == "Sentiment Analysis":
         if neg_reviews.empty:
             st.info("No clearly negative reviews (polarity < −0.1) in this selection.")
         else:
+            st.info(
+                "**Why does a review with a negative score still read as positive?**\n\n"
+                "TextBlob's polarity model is trained on native English text. "
+                "Two common causes of unexpected scores:\n\n"
+                "1. **Translation artefacts** — machine-translated reviews (shown as *Original · DE/FR/JA …*) "
+                "often receive inaccurate scores because the translation changes sentence structure "
+                "and the emotional weight of individual words.\n\n"
+                "2. **Mixed-sentiment phrasing** — a review mixing positives and negatives "
+                "(e.g. *great location, but cleanliness issues*) scores lower overall, "
+                "even when the guest's net impression was positive.\n\n"
+                "Treat the polarity score as a rough signal, not a verdict — always read the full text.",
+                icon="ℹ️",
+            )
             for _, row in neg_reviews.iterrows():
                 _render_review(row, positive=False)
 
