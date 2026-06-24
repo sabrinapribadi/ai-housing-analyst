@@ -1073,12 +1073,20 @@ elif page == "Sentiment Analysis":
                 st.write(original[:400])
 
     with tab_pos:
-        for _, row in reviews.nlargest(5, "sentiment").iterrows():
-            _render_review(row, positive=True)
+        pos_reviews = reviews[reviews["sentiment_label"] == "Positive"].nlargest(5, "sentiment")
+        if pos_reviews.empty:
+            st.info("No clearly positive reviews (polarity > 0.1) in this selection.")
+        else:
+            for _, row in pos_reviews.iterrows():
+                _render_review(row, positive=True)
 
     with tab_neg:
-        for _, row in reviews.nsmallest(5, "sentiment").iterrows():
-            _render_review(row, positive=False)
+        neg_reviews = reviews[reviews["sentiment_label"] == "Negative"].nsmallest(5, "sentiment")
+        if neg_reviews.empty:
+            st.info("No clearly negative reviews (polarity < −0.1) in this selection.")
+        else:
+            for _, row in neg_reviews.iterrows():
+                _render_review(row, positive=False)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
