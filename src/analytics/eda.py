@@ -57,10 +57,9 @@ class EDAAnalyzer:
             path = self.output_dir / 'price_distribution.png'
             plt.savefig(path, dpi=150, bbox_inches='tight')
             plt.close(fig)
-            plt.close('all')
             logger.info(f"💾 Saved to {path}")
             return str(path)
-        
+
         plt.show()
         return "displayed"
 
@@ -90,7 +89,6 @@ class EDAAnalyzer:
             path = self.output_dir / 'price_by_room_type.png'
             plt.savefig(path, dpi=150, bbox_inches='tight')
             plt.close(fig)
-            plt.close('all')
             logger.info(f"💾 Saved to {path}")
             return str(path)
         
@@ -123,7 +121,6 @@ class EDAAnalyzer:
             path = self.output_dir / 'price_by_neighborhood.png'
             plt.savefig(path, dpi=150, bbox_inches='tight')
             plt.close(fig)
-            plt.close('all')
             logger.info(f"💾 Saved to {path}")
             return str(path)
         
@@ -150,7 +147,6 @@ class EDAAnalyzer:
             path = self.output_dir / 'correlation_heatmap.png'
             plt.savefig(path, dpi=150, bbox_inches='tight')
             plt.close(fig)
-            plt.close('all')
             logger.info(f"💾 Saved to {path}")
             return str(path)
         

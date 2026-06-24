@@ -4,9 +4,6 @@ Uses LangGraph for agent functionality (LangChain v1.x compatible).
 """
 
 import os
-import sys
-sys.path.append('.')
-
 import pandas as pd
 import json
 from typing import List, Dict, Any
