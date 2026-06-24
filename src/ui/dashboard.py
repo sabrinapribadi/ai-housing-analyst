@@ -33,6 +33,12 @@ from src.analytics.eda import EDAAnalyzer
 from src.analytics.clustering import GeospatialClusterer
 from src.agent.agent import AirbnbAgent
 
+try:
+    from src.agent.discovery_agent import DataDiscoveryAgent, CATEGORY_COLOR
+    _DISCOVERY_AVAILABLE = True
+except ImportError:
+    _DISCOVERY_AVAILABLE = False
+
 # ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Airbnb Tokyo Analytics",
@@ -227,6 +233,7 @@ with st.sidebar:
         (":material/map:",          "Maps"),
         (":material/table_chart:",  "Data Explorer"),
         (":material/reviews:",      "Sentiment Analysis"),
+        (":material/manage_search:", "Data Discovery"),
     ]
     for icon, label in NAV_ITEMS:
         is_active = st.session_state.page == label
@@ -1038,3 +1045,246 @@ elif page == "Sentiment Analysis":
     with tab_neg:
         for _, row in reviews.nsmallest(5, "sentiment").iterrows():
             _render_review(row, positive=False)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DATA DISCOVERY & INTEGRATION
+# ═══════════════════════════════════════════════════════════════════════════════
+elif page == "Data Discovery":
+    st.title("Intelligent Data Discovery & Integration")
+    st.caption(
+        "Phase 1 — auto-discover patterns, anomalies, and market gaps. "
+        "Phase 2 — upload an external dataset and merge it with the Airbnb data."
+    )
+
+    if not _DISCOVERY_AVAILABLE:
+        st.error(
+            "DataDiscoveryAgent could not be imported. "
+            "Check that `src/agent/discovery_agent.py` exists and dependencies are installed."
+        )
+        st.stop()
+
+    disc_tab, integ_tab = st.tabs(["Auto-Discovery", "Data Integration"])
+
+    # ── Tab 1: Auto-Discovery ─────────────────────────────────────────────────
+    with disc_tab:
+        col_btn, col_info = st.columns([1, 5])
+        with col_btn:
+            rerun_clicked = st.button(
+                "Run Discovery",
+                icon=":material/play_circle:",
+                type="primary",
+                use_container_width=True,
+            )
+        with col_info:
+            st.caption(
+                "Scans all listings for price outliers, hidden gems, market gaps, "
+                "feature correlations, and availability patterns. "
+                "LLM narrates each finding in plain English."
+            )
+
+        if rerun_clicked:
+            st.session_state.pop("discovery_insights", None)
+
+        if "discovery_insights" not in st.session_state:
+            with st.spinner("Analysing listings for patterns and anomalies…"):
+                try:
+                    _disc_agent = DataDiscoveryAgent(filtered_df)
+                    st.session_state.discovery_insights = _disc_agent.run_full_discovery()
+                except Exception as _e:
+                    st.error(f"Discovery failed: {_e}")
+                    st.session_state.discovery_insights = []
+
+        insights = st.session_state.get("discovery_insights", [])
+
+        if not insights:
+            st.info("No insights generated. Try adjusting filters or re-running discovery.")
+        else:
+            # Category filter
+            categories = ["All"] + sorted({i.category for i in insights})
+            selected_cat = st.radio(
+                "Filter", categories, horizontal=True, label_visibility="collapsed"
+            )
+            shown = [
+                i for i in insights
+                if selected_cat == "All" or i.category == selected_cat
+            ]
+
+            st.markdown(
+                f"<p style='color:#888;font-size:13px'>"
+                f"Showing {len(shown)} of {len(insights)} insights</p>",
+                unsafe_allow_html=True,
+            )
+
+            for row_start in range(0, len(shown), 2):
+                left_col, right_col = st.columns(2)
+                for col_idx, col in enumerate([left_col, right_col]):
+                    idx = row_start + col_idx
+                    if idx >= len(shown):
+                        break
+                    ins = shown[idx]
+                    badge_color = CATEGORY_COLOR.get(ins.category, "#888")
+
+                    with col:
+                        with st.container(border=True):
+                            st.markdown(
+                                f'<span style="background:{badge_color};color:#111;'
+                                f'padding:2px 10px;border-radius:20px;font-size:11px;'
+                                f'font-weight:700;letter-spacing:.5px">'
+                                f'{ins.category.upper()}</span>'
+                                f'&nbsp;&nbsp;'
+                                f'<span style="color:#888;font-size:11px">'
+                                f'{ins.severity} severity</span>',
+                                unsafe_allow_html=True,
+                            )
+                            st.markdown(f"**{ins.title}**")
+                            st.caption(ins.narrative)
+                            if ins.chart is not None:
+                                st.plotly_chart(
+                                    ins.chart,
+                                    use_container_width=True,
+                                    key=f"disc_{idx}_{selected_cat}",
+                                )
+
+    # ── Tab 2: Data Integration ───────────────────────────────────────────────
+    with integ_tab:
+        st.subheader("Upload External Dataset")
+        st.caption(
+            "Upload a CSV or Excel file to enrich the Airbnb listings. "
+            "The agent will profile your data, suggest join keys, and merge "
+            "the new columns into the working dataset."
+        )
+
+        uploaded_file = st.file_uploader(
+            "Choose a file", type=["csv", "xlsx", "xls"],
+            label_visibility="collapsed",
+        )
+
+        if uploaded_file is not None:
+            try:
+                if uploaded_file.name.endswith((".xlsx", ".xls")):
+                    new_df = pd.read_excel(uploaded_file)
+                else:
+                    new_df = pd.read_csv(uploaded_file)
+            except Exception as _e:
+                st.error(f"Could not read file: {_e}")
+                st.stop()
+
+            st.success(
+                f"Loaded **{uploaded_file.name}** — "
+                f"{new_df.shape[0]:,} rows × {new_df.shape[1]} columns"
+            )
+
+            # Profile
+            with st.spinner("Profiling dataset…"):
+                _integ_agent = DataDiscoveryAgent(filtered_df)
+                profile = _integ_agent.profile_dataset(new_df)
+
+            st.info(f"**AI Summary:** {profile.summary}")
+
+            with st.expander("Column profile", expanded=False):
+                st.dataframe(
+                    pd.DataFrame(profile.columns),
+                    use_container_width=True,
+                    hide_index=True,
+                )
+
+            if profile.suggested_joins:
+                st.markdown(
+                    "**Suggested join keys:** "
+                    + " · ".join(f"`{c}`" for c in profile.suggested_joins)
+                )
+
+            st.divider()
+            st.subheader("Configure Integration")
+
+            # LLM mapping suggestion
+            with st.spinner("Generating column mapping suggestions…"):
+                mapping_suggestion = _integ_agent.suggest_column_mapping(new_df)
+
+            # Guess sensible defaults from the mapping
+            airbnb_key_default = "neighbourhood_cleansed"
+            new_key_default    = None
+            for new_c, airbnb_c in mapping_suggestion.items():
+                if airbnb_c == "neighbourhood_cleansed":
+                    new_key_default = new_c
+                    break
+            if new_key_default is None and profile.suggested_joins:
+                new_key_default = profile.suggested_joins[0]
+            if new_key_default is None:
+                new_key_default = new_df.columns[0]
+
+            c1, c2 = st.columns(2)
+            with c1:
+                join_key_new = st.selectbox(
+                    "Join key in uploaded dataset",
+                    options=list(new_df.columns),
+                    index=list(new_df.columns).index(new_key_default)
+                    if new_key_default in new_df.columns else 0,
+                    help="The column in your file that identifies each record",
+                )
+            with c2:
+                airbnb_options = list(filtered_df.columns)
+                join_key_airbnb = st.selectbox(
+                    "Matching column in Airbnb data",
+                    options=airbnb_options,
+                    index=airbnb_options.index(airbnb_key_default)
+                    if airbnb_key_default in airbnb_options else 0,
+                    help="The Airbnb column to join on",
+                )
+
+            importable = [c for c in new_df.columns if c != join_key_new]
+            import_cols = st.multiselect(
+                "Columns to import from uploaded dataset",
+                options=importable,
+                default=importable[:min(5, len(importable))],
+                help="Which new columns to add to the Airbnb data",
+            )
+
+            with st.expander("LLM mapping suggestions", expanded=False):
+                mapping_df = pd.DataFrame(
+                    [{"New column": k, "Suggested Airbnb column": v or "—"}
+                     for k, v in mapping_suggestion.items()]
+                )
+                st.dataframe(mapping_df, use_container_width=True, hide_index=True)
+
+            if st.button("Integrate Dataset", type="primary", icon=":material/merge:"):
+                if not import_cols:
+                    st.warning("Select at least one column to import.")
+                else:
+                    with st.spinner("Merging datasets…"):
+                        try:
+                            merge_agent = DataDiscoveryAgent(filtered_df)
+                            enriched_df, report = merge_agent.merge_datasets(
+                                new_df=new_df,
+                                join_key_new=join_key_new,
+                                join_key_airbnb=join_key_airbnb,
+                                import_cols=import_cols,
+                            )
+                            if report["status"] == "success":
+                                st.success(
+                                    f"Integration complete! "
+                                    f"Joined on `{report['join_key']}` · "
+                                    f"{report['match_rate']}% of rows matched · "
+                                    f"Added: "
+                                    + ", ".join(f"`{c}`" for c in report["new_columns"])
+                                )
+                                st.dataframe(
+                                    enriched_df.head(20),
+                                    use_container_width=True,
+                                )
+
+                                # Re-run discovery on enriched data
+                                with st.spinner("Re-running discovery on enriched dataset…"):
+                                    enrich_agent = DataDiscoveryAgent(enriched_df)
+                                    st.session_state.discovery_insights = (
+                                        enrich_agent.run_full_discovery()
+                                    )
+                                st.info(
+                                    "Discovery results updated — "
+                                    "switch to the Auto-Discovery tab to see new insights."
+                                )
+                            else:
+                                st.error(report.get("reason", "Integration failed."))
+                        except Exception as _e:
+                            st.error(f"Integration error: {_e}")
