@@ -39,10 +39,16 @@ class AirbnbAgent:
         self.listings  = pd.read_parquet(listings_path)
         self.eda       = EDAAnalyzer(self.listings)
         self.clusterer = GeospatialClusterer(self.listings)
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "OPENAI_API_KEY environment variable is not set. "
+                "Add it to Streamlit Cloud Secrets or your local .env file."
+            )
         self.llm = ChatOpenAI(
             model="gpt-4o-mini",
             temperature=0,
-            api_key=os.getenv("OPENAI_API_KEY"),
+            api_key=api_key,
         )
         self.agent = self._create_agent()
 

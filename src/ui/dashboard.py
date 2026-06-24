@@ -556,6 +556,20 @@ elif page == "AI Assistant":
     st.title("AI Assistant")
     st.caption("Ask questions about the Tokyo Airbnb market in plain English.")
 
+    if not os.getenv("OPENAI_API_KEY"):
+        st.error(
+            "**OpenAI API key not found.**\n\n"
+            "To enable the AI Assistant on Streamlit Cloud:\n"
+            "1. Click **Manage app** (bottom-right of this page)\n"
+            "2. Go to **Settings → Secrets**\n"
+            "3. Add the following and save:\n\n"
+            "```toml\n"
+            "OPENAI_API_KEY = \"sk-...\"\n"
+            "```\n\n"
+            "The app will automatically restart once the secret is saved."
+        )
+        st.stop()
+
     agent = load_agent()
 
     PRESETS = [
