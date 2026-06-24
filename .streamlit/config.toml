@@ -1,7 +1,12 @@
 [theme]
-base                  = "dark"
-primaryColor          = "#FF5A5F"
-backgroundColor       = "#111111"
+base = "dark"
+primaryColor = "#FF5A5F"
+backgroundColor = "#111111"
 secondaryBackgroundColor = "#1C1C1C"
-textColor             = "#F0F0F0"
-font                  = "sans serif"
+textColor = "#F0F0F0"
+
+[server]
+maxUploadSize = 200
+
+[browser]
+gatherUsageStats = false
