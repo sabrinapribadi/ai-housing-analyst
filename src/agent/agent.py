@@ -1,6 +1,6 @@
 """
 LLM Agent for Airbnb Tokyo Data Analysis.
-Uses LangChain AgentExecutor (compatible with LangChain/LangGraph 1.x).
+Uses LangGraph create_react_agent (LangGraph 1.x / LangChain 1.x compatible).
 """
 
 import os
@@ -9,10 +9,10 @@ import logging
 
 import pandas as pd
 from dotenv import load_dotenv
-from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain.tools import tool
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
 
 from src.analytics.eda import EDAAnalyzer
 from src.analytics.clustering import GeospatialClusterer
@@ -36,8 +36,8 @@ class AirbnbAgent:
     """LLM agent for answering plain-English questions about Airbnb Tokyo data."""
 
     def __init__(self, listings_path: str = "data/processed/listings_processed.parquet"):
-        self.listings = pd.read_parquet(listings_path)
-        self.eda      = EDAAnalyzer(self.listings)
+        self.listings  = pd.read_parquet(listings_path)
+        self.eda       = EDAAnalyzer(self.listings)
         self.clusterer = GeospatialClusterer(self.listings)
         self.llm = ChatOpenAI(
             model="gpt-4o-mini",
@@ -114,21 +114,12 @@ class AirbnbAgent:
 
     # ── Agent ─────────────────────────────────────────────────────────────────
 
-    def _create_agent(self) -> AgentExecutor:
-        """Build an AgentExecutor using LangChain's tool-calling agent."""
-        tools = self._create_tools()
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", _SYSTEM_PROMPT),
-            ("human", "{input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad"),
-        ])
-        agent = create_tool_calling_agent(self.llm, tools, prompt)
-        return AgentExecutor(
-            agent=agent,
-            tools=tools,
-            verbose=False,
-            handle_parsing_errors=True,
-            max_iterations=5,
+    def _create_agent(self):
+        """Build a LangGraph ReAct agent."""
+        return create_react_agent(
+            model=self.llm,
+            tools=self._create_tools(),
+            prompt=SystemMessage(content=_SYSTEM_PROMPT),
         )
 
     # ── Public API ────────────────────────────────────────────────────────────
@@ -136,8 +127,13 @@ class AirbnbAgent:
     def ask(self, question: str) -> str:
         """Ask a question and return the agent's plain-text answer."""
         try:
-            result = self.agent.invoke({"input": question})
-            answer = result["output"]
+            response = self.agent.invoke(
+                {"messages": [HumanMessage(content=question)]}
+            )
+            messages = response.get("messages", [])
+            if not messages:
+                return "No response from agent."
+            answer = messages[-1].content
 
             # Flag hedged language so the user knows the answer is approximate
             if any(w in answer.lower() for w in ("maybe", "might", "could", "approximately")):
