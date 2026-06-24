@@ -829,8 +829,28 @@ elif page == "Data Explorer":
     row_count = st.slider("Rows to show", 50, 500, 100, 50, key="row_slider")
 
     if selected_cols:
+        display_df = filtered_df[selected_cols].head(row_count)
+
+        # Build format dict per column dtype:
+        #   int          → {:,}       e.g.  197,677
+        #   float small, has decimals → {:.2f}    e.g.  4.78  (ratings)
+        #   float small, whole nums   → {:.0f}    e.g.  1     (bedrooms)
+        #   float large, has decimals → {:,.2f}   e.g.  12,600.50
+        #   float large, whole nums   → {:,.0f}   e.g.  12,600 (JPY price)
+        fmt: dict = {}
+        for col in display_df.columns:
+            s = display_df[col].dropna()
+            if pd.api.types.is_integer_dtype(display_df[col]):
+                fmt[col] = "{:,}"
+            elif pd.api.types.is_float_dtype(display_df[col]):
+                has_dec = bool(len(s) and ((s - s.round(0)).abs() > 0.001).any())
+                if s.abs().max() <= 10 if len(s) else True:
+                    fmt[col] = "{:.2f}" if has_dec else "{:.0f}"
+                else:
+                    fmt[col] = "{:,.2f}" if has_dec else "{:,.0f}"
+
         st.dataframe(
-            filtered_df[selected_cols].head(row_count),
+            display_df.style.format(fmt, na_rep="—"),
             use_container_width=True,
             height=340,
         )
