@@ -199,7 +199,7 @@ class GeospatialClusterer:
 
         colors = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige']
 
-        sample_df = df.iloc[::50]
+        sample_df = df.sample(n=min(500, len(df)), random_state=42)
 
         for _, row in sample_df.iterrows():
             cluster_id = int(row['cluster'])
