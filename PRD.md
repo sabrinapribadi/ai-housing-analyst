@@ -1,6 +1,6 @@
 PRODUCT REQUIREMENT DOCUMENT (PRD)
 Project: AI Housing Market Analyst – An LLM-Powered Data Agent
-Version: 4.0 (Final — Discovery & Testing)
+Version: 4.1 (Polish — Data Quality & Sentiment UX)
 Author: Sabrina Pribadi
 Date: June 25, 2026
 Status: Completed
@@ -110,7 +110,8 @@ Module B: Analytics & Modelling
 - B.1 EDA Automation: Annotated price distribution (mean/median lines), price by room type,
       price by neighbourhood (bar, treemap, box plot), price vs rating scatter.
 - B.2 Geospatial Clustering: K-Means on coordinates + price to identify 5 market segments.
-- B.3 Sentiment Analysis: TextBlob analysis on 5,000+ reviews with auto-translation.
+- B.3 Sentiment Analysis: TextBlob analysis on up to 100,000 reviews per filter combination,
+      with auto-translation of non-English text. Results cached per unique filter set.
 - B.4 Price Predictor: Rule-based prediction tool with user inputs.
 - B.5 Summary Reports: Automated market summary with key statistics.
 
@@ -150,14 +151,29 @@ Module D: Web Interface
 - D.8 Data Explorer:
       - Column selector (79 → user-chosen columns)
       - Configurable row count slider
+      - Smart number formatting via pandas Styler:
+          · Integer columns → thousands separator (e.g. 197,677)
+          · Large float columns with no decimal part → {:,.0f} (e.g. ¥12,600)
+          · Large float columns with decimals → {:,.2f}
+          · Small float columns (ratings, bathrooms) → {:.2f} or {:.0f} if whole numbers
       - Distribution viewer: annotated histogram + statistics table for any numeric column
       - Data quality chart: % missing values per column (colour-scaled bar chart)
       - Neighbourhood comparison table and chart
 - D.9 Sentiment Analysis:
-      - Auto-detect language with langdetect; translate to English with deep-translator
-      - HTML tag stripping from raw review text
-      - Original language shown in collapsible expander
-      - Warning banner if translation packages are not installed
+      - Sample up to 100,000 reviews per unique filter combination (capped from 444K total).
+        First load shows a spinner ("~15 s"); subsequent loads for the same filter are instant
+        thanks to @st.cache_data keyed on the tuple of matching listing IDs.
+      - Scoring legend displayed above tabs: Positive > 0.1, Neutral ±0.1, Negative < −0.1.
+      - Most Positive tab: filters to sentiment_label == "Positive" before selecting top 5.
+      - Most Negative tab: filters to sentiment_label == "Negative" before selecting bottom 5.
+        Displays "No clearly negative reviews in this selection" when none qualify.
+        Includes an info banner explaining two known causes of apparent score/text mismatch:
+          (1) translation artefacts — TextBlob trained on native English, not translated text;
+          (2) mixed-sentiment phrasing — positive + negative elements lower the overall score.
+      - Auto-detect language with langdetect; translate to English with deep-translator.
+      - HTML tag stripping from raw review text.
+      - Original language shown in collapsible expander.
+      - Warning banner if translation packages are not installed.
 - D.10 Data Discovery page — see Module E below.
 
 Module E: Data Discovery & Integration Agent (DataDiscoveryAgent)
@@ -307,6 +323,9 @@ Data Pipeline:
 | 6      | 2 days   | UI/UX: dark theme, golden ratio, Plotly charts, enhanced maps | Completed |
 | 7      | 2 days   | Data Discovery agent, Data Integration workflow,              | Completed |
 |        |          | hallucination detection test suite                            |           |
+| 8      | 1 day    | Polish: Data Explorer number formatting, sentiment sample     | Completed |
+|        |          | raised to 100K, genuine label filtering for review tabs,      |           |
+|        |          | scoring methodology disclaimer with known-limitations note    |           |
 
 
 10. TESTING STRATEGY
