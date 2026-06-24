@@ -189,8 +189,8 @@ def _sentiment_for_listings(listing_ids: tuple) -> pd.DataFrame:
         filtered = reviews[reviews["listing_id"].isin(listing_ids)]
         if len(filtered) == 0:
             return pd.DataFrame()
-        if len(filtered) > 5000:
-            filtered = filtered.sample(5000, random_state=42)
+        if len(filtered) > 100_000:
+            filtered = filtered.sample(100_000, random_state=42)
         filtered = filtered.copy()
 
         def _polarity(text: str) -> float:
@@ -1005,7 +1005,8 @@ elif page == "Sentiment Analysis":
         )
 
     _listing_ids = tuple(sorted(filtered_df["id"].tolist()))
-    reviews = _sentiment_for_listings(_listing_ids)
+    with st.spinner("Scoring reviews… (first load for this filter ~15 s, cached after)"):
+        reviews = _sentiment_for_listings(_listing_ids)
 
     if len(reviews) == 0:
         st.info(
@@ -1055,9 +1056,9 @@ elif page == "Sentiment Analysis":
     st.markdown("---")
     st.subheader("Sample Reviews")
     st.caption(
-        "Scores are TextBlob polarity (−1 to +1). "
-        "Positive > 0.1 · Neutral −0.1 to 0.1 · Negative < −0.1. "
-        "Non-English reviews are auto-translated before scoring — expand a card to see the original."
+        f"Scoring up to 100,000 of the {len(reviews):,} reviews matching your current filters. "
+        "TextBlob polarity: Positive > 0.1 · Neutral −0.1 to 0.1 · Negative < −0.1. "
+        "Non-English reviews are auto-translated — expand a card to see the original."
     )
     tab_pos, tab_neg = st.tabs(["Most Positive", "Most Negative"])
 
