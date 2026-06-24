@@ -182,11 +182,16 @@ def load_data() -> pd.DataFrame:
 
 
 @st.cache_data
-def load_reviews_with_sentiment() -> pd.DataFrame:
+def _sentiment_for_listings(listing_ids: tuple) -> pd.DataFrame:
+    """Load and score reviews for the given listing IDs (cached per unique filter)."""
     try:
         reviews = pd.read_parquet("data/processed/reviews_processed.parquet")
-        if len(reviews) > 5000:
-            reviews = reviews.sample(5000, random_state=42)
+        filtered = reviews[reviews["listing_id"].isin(listing_ids)]
+        if len(filtered) == 0:
+            return pd.DataFrame()
+        if len(filtered) > 5000:
+            filtered = filtered.sample(5000, random_state=42)
+        filtered = filtered.copy()
 
         def _polarity(text: str) -> float:
             try:
@@ -194,13 +199,13 @@ def load_reviews_with_sentiment() -> pd.DataFrame:
             except Exception:
                 return 0.0
 
-        reviews["sentiment"] = reviews["comments"].apply(_polarity)
-        reviews["sentiment_label"] = pd.cut(
-            reviews["sentiment"],
+        filtered["sentiment"] = filtered["comments"].apply(_polarity)
+        filtered["sentiment_label"] = pd.cut(
+            filtered["sentiment"],
             bins=[-1, -0.1, 0.1, 1],
             labels=["Negative", "Neutral", "Positive"],
         )
-        return reviews
+        return filtered
     except Exception as e:
         st.warning(f"Could not load reviews: {e}")
         return pd.DataFrame()
@@ -972,7 +977,6 @@ elif page == "Data Explorer":
 # ═══════════════════════════════════════════════════════════════════════════════
 elif page == "Sentiment Analysis":
     st.title("Review Sentiment")
-    st.caption("TextBlob polarity scores on a 5,000-review sample.")
 
     if not _TRANSLATION_AVAILABLE:
         st.warning(
@@ -980,11 +984,21 @@ elif page == "Sentiment Analysis":
             "Run `python -m pip install langdetect deep-translator` and restart."
         )
 
-    reviews = load_reviews_with_sentiment()
+    _listing_ids = tuple(sorted(filtered_df["id"].tolist()))
+    reviews = _sentiment_for_listings(_listing_ids)
 
     if len(reviews) == 0:
-        st.info("No review data found. Run `scripts/save_processed_data.py` first.")
+        st.info(
+            "No reviews found for the current filter. "
+            "Try broadening the price range, room type, or neighbourhood selection."
+        )
         st.stop()
+
+    _n_listings = len(filtered_df)
+    st.caption(
+        f"TextBlob polarity scores on up to 5,000 reviews from the "
+        f"**{_n_listings:,}** listings matching your current filters."
+    )
 
     sc1, sc2, sc3 = st.columns(3)
     sc1.metric("Reviews Analysed", f"{len(reviews):,}")
