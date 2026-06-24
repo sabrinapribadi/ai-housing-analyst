@@ -1,6 +1,6 @@
 # Airbnb Tokyo Analytics Platform
 
-An end-to-end data analytics and AI platform for exploring the Tokyo Airbnb market. Ask questions in plain English and get interactive charts, maps, and predictions — no SQL or Python required.
+An end-to-end data analytics and AI platform for exploring the Tokyo Airbnb market. Ask questions in plain English, get interactive charts and maps, discover hidden patterns automatically, and merge in your own external datasets — no SQL or Python required.
 
 ## Features
 
@@ -8,29 +8,36 @@ An end-to-end data analytics and AI platform for exploring the Tokyo Airbnb mark
 |------|-------------|
 | **Dashboard** | Key market metrics, annotated price histogram, neighbourhood treemap, price vs rating scatter, box plot, rule-based price predictor |
 | **AI Assistant** | Natural language Q&A powered by LangChain + GPT-4o-mini; generated charts appear inline in the chat |
-| **Maps** | Choropleth by avg price with hover tooltips, listing density heatmap, MarkerCluster with rich popups — all on a dark tile base with a layer guide panel |
-| **Sentiment Analysis** | TextBlob scoring on 5,000+ reviews; non-English reviews auto-translated to English via `deep-translator` |
+| **Maps** | Choropleth by avg price with hover tooltips, listing density heatmap, MarkerCluster with rich popups — dark tile base with a layer guide panel |
+| **Sentiment Analysis** | TextBlob scoring on 5,000+ reviews; non-English reviews auto-translated to English |
 | **Data Explorer** | Column selector, configurable row count, distribution viewer, data quality chart, neighbourhood comparison |
+| **Data Discovery** | Auto-Discovery tab: surfaces 5 insight types (anomalies, gems, gaps, correlations, patterns) with LLM narration and Plotly charts. Data Integration tab: upload any CSV/Excel, AI-guided column mapping, left-join merge into the Airbnb dataset |
 
 ## Project Structure
 
 ```
 ai-housing-analyst/
 ├── .streamlit/
-│   └── config.toml          # Dark theme + Airbnb coral accent
+│   └── config.toml              # Dark theme + Airbnb coral accent
 ├── src/
-│   ├── agent/               # LangChain ReAct agent and 6 tool definitions
-│   ├── analytics/           # EDA plots and K-Means geospatial clustering
-│   ├── data/                # Loader, cleaner, feature engineer
-│   ├── models/              # Forecast model (Prophet)
+│   ├── agent/
+│   │   ├── agent.py             # LangChain Q&A agent (6 tools)
+│   │   └── discovery_agent.py   # DataDiscoveryAgent: auto-discovery + data integration
+│   ├── analytics/
+│   │   ├── eda.py               # EDA plot functions (Matplotlib)
+│   │   └── clustering.py        # K-Means geospatial clustering
+│   ├── data/                    # Loader, cleaner, feature engineer
+│   ├── models/                  # Forecast model (Prophet)
 │   └── ui/
-│       └── dashboard.py     # Streamlit multi-page app (single file)
+│       └── dashboard.py         # Streamlit 6-page app
 ├── scripts/
 │   ├── save_processed_data.py   # Run once to build Parquet files
 │   └── train_forecast.py        # Train and serialise the forecast model
-├── data/                    # Raw CSV / GeoJSON (not committed — see .gitignore)
-├── outputs/                 # Saved plots (auto-created at runtime)
 ├── tests/
+│   ├── test_hallucination.py    # Automated hallucination detection suite
+│   └── hallucination_checklist.md
+├── data/                        # Raw CSV / GeoJSON (not committed — see .gitignore)
+├── outputs/                     # Agent-generated plots (auto-created at runtime)
 ├── notebooks/
 └── pyproject.toml
 ```
@@ -47,7 +54,7 @@ cd ai-housing-analyst
 # Install core dependencies
 poetry install
 
-# Install UI / map extras into the active Python environment
+# Install UI / map / translation extras
 pip install streamlit-folium langdetect deep-translator
 ```
 
@@ -57,7 +64,7 @@ Copy and fill in the environment file:
 cp .env.example .env
 ```
 
-Edit `.env` and set your key:
+Edit `.env`:
 
 ```
 OPENAI_API_KEY=sk-...
@@ -88,15 +95,44 @@ python scripts/save_processed_data.py
 python -m streamlit run src/ui/dashboard.py
 ```
 
-The app opens at `http://localhost:8501`.
+Opens at `http://localhost:8501`.
 
 > **Note:** Use `python -m streamlit run` (not `poetry run streamlit run`) to ensure all
-> pip-installed extras (`streamlit-folium`, `langdetect`, `deep-translator`) are resolved
-> from the same Python environment.
+> pip-installed extras are resolved from the same Python environment.
+
+## Running Tests
+
+The hallucination detection suite fires 6 standard questions at the live agent and compares
+reported numbers against ground truth loaded directly from the Parquet file:
+
+```bash
+python tests/test_hallucination.py
+```
+
+Sample output:
+
+```
+============================================================
+HALLUCINATION DETECTION TEST SUITE
+============================================================
+
+   Testing: What's the average price of an Airbnb in Tokyo?
+   Response: The average price of an Airbnb listing in Tokyo is approximately ¥24,782...
+   Status: PASS
+
+...
+
+============================================================
+SUMMARY
+============================================================
+Tests:                  6
+Passed:                 6 (100.0%)
+Hallucinations detected:0
+```
 
 ## Theme
 
-The dark theme is defined in `.streamlit/config.toml` and applied automatically:
+Defined in `.streamlit/config.toml` and applied automatically:
 
 ```toml
 [theme]
@@ -118,6 +154,7 @@ textColor                = "#F0F0F0"
 | ML              | scikit-learn (K-Means), Prophet                                           |
 | Data            | Pandas, NumPy, GeoPandas                                                  |
 | NLP             | TextBlob (sentiment), langdetect, deep-translator                         |
+| Schema matching | difflib (fuzzy fallback for column mapping without LLM)                   |
 | Code quality    | Black, Ruff, mypy, pre-commit                                             |
 
 ## Data Source
@@ -139,3 +176,4 @@ textColor                = "#F0F0F0"
 - **Cheapest district:** Higashiyamato Shi (¥5,136 avg)
 - **Top room type:** Entire home/apt (23,759 listings)
 - **Market segments:** 5 K-Means clusters (Luxury Central, Premium Central, etc.)
+- **Hidden gems:** ~6,000 listings rated above median but priced below median

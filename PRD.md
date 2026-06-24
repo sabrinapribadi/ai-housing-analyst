@@ -1,6 +1,6 @@
 PRODUCT REQUIREMENT DOCUMENT (PRD)
 Project: AI Housing Market Analyst – An LLM-Powered Data Agent
-Version: 3.0 (Final — UI/UX Iteration)
+Version: 4.0 (Final — Discovery & Testing)
 Author: Sabrina Pribadi
 Date: June 25, 2026
 Status: Completed
@@ -10,32 +10,37 @@ Status: Completed
 
 Problem: Real estate investors, policymakers, and analysts lack an intuitive way to explore
 housing data. They either write complex SQL/Python or rely on static dashboards that can't
-answer ad-hoc questions.
+answer ad-hoc questions — and they have no way to integrate their own external datasets
+without engineering support.
 
 Solution: An LLM agentic system that lets users ask natural-language questions about Tokyo's
-Airbnb housing data, automatically runs analytics, builds forecasts, and visualises results —
-all through a polished Streamlit web interface with a dark theme and golden ratio layout.
+Airbnb housing data, automatically surfaces hidden patterns without prompting, integrates
+external datasets via an AI-guided schema-mapping workflow, and validates its own outputs
+against ground truth through an automated hallucination detection suite.
 
 Value Proposition: Reduce time-to-insight from days to minutes. Democratise data access for
 non-technical stakeholders. Demonstrate end-to-end data science, MLOps, LLM engineering,
-and product-quality UI/UX skills.
+product-quality UI/UX, and AI safety practices.
 
 Success Metrics:
 - Agent correctly answers 5+ test questions with inline chart display
+- Hallucination test suite passes 6/6 questions against ground truth
+- Data Discovery surfaces 5 distinct insight types on first run
+- External dataset integrates with > 80% row match rate on neighbourhood key
 - Dashboard loads in < 3 seconds
-- All features deployed and functional
-- Non-English reviews automatically translated to English
 
 
 2. PROJECT CONTEXT & BACKGROUND
 
 This project was built as a portfolio piece to demonstrate capabilities in:
 1. Data Engineering: Ingesting, cleaning, and aggregating multi-table datasets (10M+ rows).
-2. Data Analytics & ML: Performing EDA, time-series analysis, geospatial clustering (K-Means).
-3. LLM & Agentic Design: Building a LangChain agent that uses tools to answer data questions.
-4. Software Engineering: Creating a modular, testable codebase with a clean UI.
-5. MLOps Thinking: Adopting production pipeline patterns.
-6. UI/UX Design: Applying golden ratio layout, dark theme, and data visualisation best practices.
+2. Data Analytics & ML: Performing EDA, geospatial clustering (K-Means), sentiment analysis.
+3. LLM & Agentic Design: Building a LangChain agent, a discovery agent, and an integration
+   agent — each with fallback strategies when the LLM is unavailable.
+4. Software Engineering: Modular, testable codebase with centralised helpers and clean UI.
+5. MLOps Thinking: Production pipeline patterns, Parquet for fast loading, Agg backend safety.
+6. UI/UX Design: Golden ratio layout, dark theme, Material icons, inline chart display.
+7. AI Safety: Automated hallucination detection against Parquet ground truth.
 
 Data Source: Inside Airbnb Tokyo (https://insideairbnb.com/get-the-data/)
 - listings.csv: 27,945 rows, 79 columns
@@ -51,9 +56,12 @@ In-Scope:
 - Analytics: EDA on listings, price trends by neighbourhood, geospatial clustering
 - Modelling: Geospatial clustering (K-Means), sentiment analysis, price prediction
 - LLM Agent: Answer natural language questions, generate and display visualisations inline
-- UI: Streamlit dashboard with dark theme, golden ratio layout, interactive Plotly charts
+- Data Discovery: Proactively surface 5 insight types without user prompting
+- Data Integration: Upload external CSV/Excel, AI-guided schema mapping, left-join merge
+- UI: Streamlit dashboard with 6 pages, dark theme, golden ratio layout, Plotly charts
 - Maps: Multi-layer Folium map with choropleth, heatmap, and marker clusters
 - Translation: Auto-translate non-English reviews to English
+- Testing: Automated hallucination detection suite against Parquet ground truth
 - Deployment: GitHub repository with comprehensive README and Streamlit config
 
 Out-of-Scope:
@@ -66,21 +74,26 @@ Out-of-Scope:
 
 4. USER PERSONAS & STORIES
 
-| Persona              | Goal                                                             | Pain Point                       |
-|----------------------|------------------------------------------------------------------|----------------------------------|
-| Alex (Analyst)       | Deep dives on price trends, seasonality, geographic clusters.    | Wastes time writing code.        |
-| Maria (Investor)     | Identify underpriced neighbourhoods with high growth potential.  | Doesn't know SQL/Python.         |
-| James (Policymaker)  | Understand affordability and supply-demand dynamics.             | Needs quick, trustworthy answers.|
+| Persona              | Goal                                                             | Pain Point                        |
+|----------------------|------------------------------------------------------------------|-----------------------------------|
+| Alex (Analyst)       | Deep dives on price trends, seasonality, geographic clusters.    | Wastes time writing code.         |
+| Maria (Investor)     | Identify underpriced neighbourhoods with high growth potential.  | Doesn't know SQL/Python.          |
+| James (Policymaker)  | Understand affordability and supply-demand dynamics.             | Needs quick, trustworthy answers. |
+| Dana (Data Engineer) | Enrich the Airbnb dataset with ward-level demographic data.      | Schema mapping takes days.        |
 
 User Stories Implemented:
 - As a user, I can type a question in plain English and see a visual answer with inline charts.
-- As a user, I can ask for price predictions based on listing details.
-- As a user, I can view a pre-built dashboard with key market metrics and 4 chart types.
+- As a user, I can ask for price predictions based on listing attributes.
+- As a user, I can view a pre-built dashboard with key market metrics and 5 chart types.
 - As a user, I can filter data by price, room type, and neighbourhood.
 - As a user, I can download filtered reports as CSV.
 - As a user, I can analyse review sentiment with automatic translation of non-English reviews.
 - As a user, I can explore listing data with a column selector and distribution viewer.
 - As a user, I can view a multi-layer interactive map with hover tooltips.
+- As a user, I can see automatically surfaced insights — anomalies, hidden gems, market gaps —
+  without writing a single query.
+- As a data engineer, I can upload a CSV, review AI-suggested column mappings, and merge
+  external data into the Airbnb dataset in one workflow.
 
 
 5. FUNCTIONAL REQUIREMENTS
@@ -101,7 +114,7 @@ Module B: Analytics & Modelling
 - B.4 Price Predictor: Rule-based prediction tool with user inputs.
 - B.5 Summary Reports: Automated market summary with key statistics.
 
-Module C: LLM Agentic Layer
+Module C: Q&A Agent (AirbnbAgent)
 - C.1 Agent Framework: LangChain with LangGraph (v1.3 compatible).
 - C.2 Tools Provided: 6 tools — summary stats, price plots, neighbourhood plot, room type
       plot, cluster summary, neighbourhood recommendation.
@@ -112,12 +125,13 @@ Module C: LLM Agentic Layer
 
 Module D: Web Interface
 - D.1 Framework: Streamlit with dark theme enforced via .streamlit/config.toml.
-- D.2 Pages: Dashboard, AI Assistant, Maps, Data Explorer, Sentiment Analysis.
+- D.2 Pages: Dashboard, AI Assistant, Maps, Data Explorer, Sentiment Analysis,
+      Data Discovery.
 - D.3 Navigation: Sidebar with Material icon buttons; active page highlighted with coral
       left-border accent; neighbourhood filter in expandable panel.
-- D.4 Layout: Golden ratio column splits (1:1.618) applied to chart rows, predictor form,
-      and sentiment analysis. Fibonacci-scale spacing (8→13→21→34px).
-- D.5 Charts: All charts use Plotly with transparent dark backgrounds to blend with the theme.
+- D.4 Layout: Golden ratio column splits (1:1.618) applied throughout. Fibonacci-scale
+      spacing (8→13→21→34px).
+- D.5 Charts: All charts use Plotly with transparent dark backgrounds.
 - D.6 Dashboard Charts:
       - Annotated price histogram with mean (amber) and median (teal) reference lines
       - Average price by room type (horizontal bar)
@@ -128,7 +142,7 @@ Module D: Web Interface
 - D.7 Maps:
       - Layer 1: Neighbourhood choropleth (GeoJSON filled by avg price, YlOrRd scale)
         with hover tooltips showing district name, avg price, and listing count
-      - Layer 2: Listing density heatmap (folium HeatMap, hidden by default)
+      - Layer 2: Listing density heatmap (HeatMap plugin, hidden by default)
       - Layer 3: MarkerCluster of individual listings with rich popups (hidden by default)
       - Dark map tiles (CartoDB dark_matter)
       - Folium LayerControl for toggling layers
@@ -136,7 +150,7 @@ Module D: Web Interface
 - D.8 Data Explorer:
       - Column selector (79 → user-chosen columns)
       - Configurable row count slider
-      - Distribution viewer: histogram + statistics table for any numeric column
+      - Distribution viewer: annotated histogram + statistics table for any numeric column
       - Data quality chart: % missing values per column (colour-scaled bar chart)
       - Neighbourhood comparison table and chart
 - D.9 Sentiment Analysis:
@@ -144,17 +158,79 @@ Module D: Web Interface
       - HTML tag stripping from raw review text
       - Original language shown in collapsible expander
       - Warning banner if translation packages are not installed
-- D.10 Deployment: GitHub-ready with .streamlit/config.toml for consistent dark theme.
+- D.10 Data Discovery page — see Module E below.
+
+Module E: Data Discovery & Integration Agent (DataDiscoveryAgent)
+- E.1 Auto-Discovery: run_full_discovery() executes 5 independent analysis methods against
+      the current filtered DataFrame and returns a list of Insight objects, each containing
+      a title, LLM-narrated description, category badge, severity level, and Plotly chart.
+
+  Discovery methods:
+  - Price Anomalies: neighbourhoods where mean price greatly exceeds the median,
+    indicating a small number of outlier luxury listings.
+  - Hidden Gems: listings rated above the market median but priced below it —
+    best-value options by neighbourhood.
+  - Market Gaps: room-type × neighbourhood combinations with low supply (≤ 20th pctl)
+    but high avg rating (≥ 70th pctl), signalling unmet demand.
+  - Feature Correlations: Pearson r of all numeric listing attributes against price,
+    identifying the strongest positive and negative predictors.
+  - Availability Patterns: districts that command premium prices despite low annual
+    availability, indicating sustained high-occupancy demand.
+
+- E.2 Dataset Profiling: profile_dataset() accepts any Pandas DataFrame and returns a
+      DataProfile with column types, unique counts, missing-value percentages, sample
+      values, suggested join keys, and an LLM-generated plain-English summary.
+
+- E.3 Column Mapping: suggest_column_mapping() uses GPT-4o-mini to match external
+      dataset columns to Airbnb schema columns. Falls back to difflib fuzzy string
+      matching when the LLM is unavailable.
+
+- E.4 Dataset Merge: merge_datasets() left-joins selected columns from the external
+      dataset into self.listings on the confirmed join key. Returns the enriched
+      DataFrame and a report (join key, match rate, new columns added).
+
+- E.5 Post-Merge Discovery: after a successful integration, the UI re-runs
+      run_full_discovery() on the enriched dataset and updates session state so
+      the Auto-Discovery tab reflects the new combined data.
+
+- E.6 UI — Auto-Discovery Tab:
+      - Runs on first page visit; "Re-run" button clears cache and repeats.
+      - Category filter pills (All / anomaly / correlation / gap / pattern).
+      - 2-column card grid: colour-coded category badge, severity label, title,
+        LLM narrative, inline Plotly chart.
+
+- E.7 UI — Data Integration Tab:
+      - CSV/Excel file uploader.
+      - LLM dataset summary and column profile table.
+      - Join key selectors (new dataset key ↔ Airbnb column).
+      - Import column multiselect (up to all non-key columns).
+      - LLM mapping suggestions shown in collapsible expander.
+      - Merge button with success banner showing match rate and new columns.
+
+Module F: Hallucination Detection (tests/test_hallucination.py)
+- F.1 Ground Truth Loading: _load_ground_truth() reads the processed Parquet file
+      and derives authoritative values for: total listings, avg/median price, most
+      and least expensive neighbourhoods, room type counts.
+- F.2 Price Error Detection: detect_price_errors() extracts numbers from the agent
+      response and flags deviations > 10% from ground truth (high severity > 20%).
+- F.3 Fabrication Detection: detect_fabricated_facts() flags overconfidence language
+      ("exactly", "precisely") and false negatives (claiming no review data when the
+      Parquet file has rows).
+- F.4 Test Runner: run_hallucination_tests() executes 6 standard questions, prints
+      PASS/FAIL per question, and summarises total pass rate.
 
 
 6. NON-FUNCTIONAL REQUIREMENTS
 
-- Performance: Agent response < 10 seconds; Dashboard loads < 3 seconds.
-- Cost: LLM API calls minimal (GPT-4o-mini; responses cached where possible).
+- Performance: Agent Q&A response < 10 seconds; Dashboard loads < 3 seconds;
+  Auto-Discovery completes < 20 seconds (5 methods + LLM narration).
+- Cost: LLM calls minimised — GPT-4o-mini throughout; narration cached in session state.
+- Resilience: All LLM calls have fallbacks (hardcoded narratives, fuzzy column matching)
+  so the app functions without an API key.
 - Code Quality: Modular structure (src/analytics/, src/agent/, src/data/, src/ui/).
-  Helper functions (_chart, _clean_review, _translate) centralised at module level.
+  Helper functions (_chart, _clean_review, _translate, _theme, _narrate) centralised.
 - Theme: Consistent dark theme via config.toml; primaryColor #FF5A5F (Airbnb coral).
-- Documentation: Complete README.md and PRD.md.
+- Documentation: Complete README.md and PRD.md kept in sync with each sprint.
 - Version Control: Clean Git history on GitHub.
 
 
@@ -190,67 +266,79 @@ Data Pipeline:
 
 8. TECHNICAL ARCHITECTURE
 
-+------------------------------------------------------------------+
-|                         STREAMLIT UI                             |
-|  +----------+  +----------+  +-------+  +--------+  +--------+  |
-|  |Dashboard |  |AI Agent  |  | Maps  |  |DataExp.|  |Sentiment|  |
-|  +----------+  +----------+  +-------+  +--------+  +--------+  |
-+----------------------------+-------------------------------------+
-                             |
-+----------------------------+-------------------------------------+
-|                     LLM AGENT (LangChain/LangGraph)              |
-|  System Prompt: "You are a data analyst. Use tools."            |
-|  6 Tools: Summary Stats, Price Plots, Cluster Summary, etc.     |
-+-------+--------+--------+--------+----------------------------+
-        |        |        |        |
-        v        v        v        v
-   +--------+  +-------+  +------+  +----------+  +----------+
-   | Pandas |  |Plotly |  |Folium|  | TextBlob |  |deep-     |
-   | Query  |  |Charts |  | Maps |  | Sentiment|  |translator|
-   +--------+  +-------+  +------+  +----------+  +----------+
-        |        |        |        |
-        +--------+--------+--------+
-                        |
-              +---------+----------+
-              |  Cleaned Data      |
-              |  (Parquet Files)   |
-              +--------------------+
++------------------------------------------------------------------------+
+|                            STREAMLIT UI (6 pages)                      |
+|  +----------+ +----------+ +-------+ +--------+ +--------+ +--------+ |
+|  |Dashboard | |AI Agent  | | Maps  | |DataExp.| |Sentimt.| |Discvry.| |
+|  +----------+ +----------+ +-------+ +--------+ +--------+ +--------+ |
++------------------------------------+-----------------------------------+
+                                     |
+          +--------------------------+--------------------------+
+          |                          |                          |
++---------+---------+    +-----------+-----------+    +--------+--------+
+| AirbnbAgent       |    | DataDiscoveryAgent    |    | HallucinationD. |
+| (Q&A, 6 tools)    |    | (Discovery+Integrate) |    | (Test suite)    |
+| LangChain/LangGrph|    | GPT-4o-mini + difflib |    | Ground truth vs |
++---+---+---+---+---+    +-----------+-----------+    | Parquet values  |
+    |   |   |   |                    |                 +-----------------+
+    v   v   v   v                    v
++------+ +-------+ +------+   +----------+  +----------+
+|Pandas| |Plotly | |Folium|   | Pandas   |  |deep-     |
+|Query | |Charts | | Maps |   | Merge /  |  |translator|
++------+ +-------+ +------+   | Profile  |  +----------+
+    |       |        |         +----------+
+    +-------+--------+
+                |
+      +---------+----------+
+      |  Processed Data    |
+      |  (Parquet Files)   |
+      +--------------------+
 
 
 9. IMPLEMENTATION PLAN
 
-| Sprint | Duration | Deliverables                                             | Status    |
-|--------|----------|----------------------------------------------------------|-----------|
-| 1      | 3 days   | Data loading, cleaning, feature engineering              | Completed |
-| 2      | 3 days   | EDA functions, geospatial clustering                     | Completed |
-| 3      | 4 days   | LangChain agent with 6 tools                             | Completed |
-| 4      | 3 days   | Streamlit dashboard with 5 pages                         | Completed |
-| 5      | 2 days   | Deployment, README, documentation                        | Completed |
-| 6      | 2 days   | UI/UX iteration: dark theme, golden ratio, Plotly charts,| Completed |
-|        |          | enhanced maps, translation, Data Explorer improvements   |           |
+| Sprint | Duration | Deliverables                                                  | Status    |
+|--------|----------|---------------------------------------------------------------|-----------|
+| 1      | 3 days   | Data loading, cleaning, feature engineering                   | Completed |
+| 2      | 3 days   | EDA functions, geospatial clustering                          | Completed |
+| 3      | 4 days   | LangChain Q&A agent with 6 tools                              | Completed |
+| 4      | 3 days   | Streamlit dashboard with 5 pages                              | Completed |
+| 5      | 2 days   | Deployment, README, documentation                             | Completed |
+| 6      | 2 days   | UI/UX: dark theme, golden ratio, Plotly charts, enhanced maps | Completed |
+| 7      | 2 days   | Data Discovery agent, Data Integration workflow,              | Completed |
+|        |          | hallucination detection test suite                            |           |
 
 
 10. TESTING STRATEGY
 
 - Unit Tests: Data cleaning functions validated.
 - Integration Tests: Agent tools tested with sample questions.
+- Hallucination Detection (automated): tests/test_hallucination.py loads ground truth
+  from the Parquet file and runs 6 questions through the live agent, checking reported
+  numbers against authoritative values and flagging overconfidence language.
 - Manual QA: All 5 test questions answered correctly with inline chart display.
-- Dashboard Testing: All pages and features functional on Python 3.12.
+- Dashboard Testing: All 6 pages and features functional on Python 3.12.
 - Translation Testing: Spanish, French, German reviews translated correctly.
 - Map Testing: All three layers toggle correctly; hover tooltips display district data.
+- Discovery Testing: All 5 insight methods return Insight objects with charts.
+- Integration Testing: CSV upload → profile → mapping → merge flow completes end-to-end.
 
 
 11. RISKS & MITIGATIONS
 
-| Risk                            | Mitigation                                            | Status   |
-|---------------------------------|-------------------------------------------------------|----------|
-| Large calendar file (10M rows)  | Sampled for dashboard; used full file for processing  | Resolved |
-| LLM hallucination               | Show generated charts inline; limit iterations to 5  | Resolved |
-| API costs                       | Use GPT-4o-mini; cache responses                      | Resolved |
-| Deployment memory limit         | Use Parquet files; exclude raw data from Git          | Resolved |
-| GitHub file size limits         | Large files excluded via .gitignore                   | Resolved |
-| Translation package unavailable | Graceful fallback with visible warning banner         | Resolved |
-| Matplotlib/Streamlit thread safety | Use Agg backend; close figures after saving         | Resolved |
+| Risk                            | Mitigation                                              | Status   |
+|---------------------------------|---------------------------------------------------------|----------|
+| Large calendar file (10M rows)  | Sampled for dashboard; full file for processing only    | Resolved |
+| LLM hallucination               | Automated test suite (test_hallucination.py) validates  | Resolved |
+|                                 | agent answers against Parquet ground truth              |          |
+| API costs                       | GPT-4o-mini throughout; narrations cached in session    | Resolved |
+| Deployment memory limit         | Parquet files; raw data excluded from Git               | Resolved |
+| GitHub file size limits         | Large files excluded via .gitignore                     | Resolved |
+| Translation package unavailable | Graceful fallback with visible warning banner           | Resolved |
+| Matplotlib thread safety        | Agg backend; plt.close(fig) after every save            | Resolved |
+| LLM unavailable (no API key)    | Discovery narration falls back to hardcoded text;       | Resolved |
+|                                 | column mapping falls back to difflib fuzzy matching     |          |
+| External dataset schema mismatch| LLM mapping + user-editable selectors + fuzzy fallback  | Resolved |
 
 
 12. SUCCESS CRITERIA
@@ -258,18 +346,26 @@ Data Pipeline:
 Agent test questions (all passing):
 1. "Show me the average price per neighbourhood on a bar chart."
 2. "Plot the distribution of prices by room type." — chart displays inline in chat.
-3. "Forecast the average price for Shibuya for the next 3 months." (N/A — no time-series price data)
-4. "Map all listings with a price over 20,000 JPY."
-5. "Which neighbourhood has the highest average review score?"
+3. "How many listings are there in Tokyo?" — matches Parquet ground truth.
+4. "Which neighbourhood has the highest average prices?"
+5. "What's the most popular room type?"
+
+Hallucination test suite:
+- 6/6 questions pass price-error and fabrication checks against ground truth.
+
+Data Discovery:
+- 5 insight cards generated on first run without any user query.
+- Each card has a non-empty LLM narrative and an interactive Plotly chart.
+
+Data Integration:
+- CSV upload → profiling → column mapping → merge completes in < 30 seconds.
+- Merged DataFrame has all new columns and a match rate reported in the success banner.
 
 Additional criteria met:
-- Streamlit app fully functional with 5 pages and dark theme.
-- GitHub repo has complete README.md with setup, architecture, and usage instructions.
-- Code is modular with type hints and centralised helper functions.
-- Dashboard: 6 chart types, sidebar with Material icons, golden ratio layout.
+- Streamlit app fully functional with 6 pages and consistent dark theme.
+- GitHub repo has complete README.md with setup, run, and test instructions.
+- Code is modular; all LLM interactions have working offline fallbacks.
 - Maps: choropleth with hover tooltips, heatmap, MarkerCluster, layer guide panel.
-- Data Explorer: column selector, distribution viewer, data quality chart.
-- Sentiment: auto-translation, HTML stripping, collapsible originals.
 
 
 13. KEY INSIGHTS FROM DATA
@@ -282,13 +378,16 @@ Additional criteria met:
 - Top Room Type: Entire home/apt (23,759 listings)
 - Market Segments: 5 K-Means clusters (Luxury Central, Premium Central, Premium South, etc.)
 - Review Languages: Multi-lingual (Japanese, French, Spanish, German, Korean, etc.)
+- Hidden Gems: ~6,000 listings rated above median but priced below median
 
 
 14. APPENDIX
 
 - Data Source: https://insideairbnb.com/get-the-data/
 - GitHub Repository: https://github.com/sabrinapribadi/ai-housing-analyst
-- Tech Stack: Streamlit, LangChain, OpenAI, scikit-learn, GeoPandas, Folium, Plotly,
-  langdetect, deep-translator
-- Modules: 5 dashboard pages, 6 agent tools, 5 clustering segments, sentiment analysis,
-  multi-layer maps, auto-translation
+- Tech Stack: Streamlit, LangChain, LangGraph, OpenAI GPT-4o-mini, scikit-learn,
+  GeoPandas, Folium, Plotly, langdetect, deep-translator, TextBlob, difflib
+- Agents: AirbnbAgent (Q&A), DataDiscoveryAgent (discovery + integration)
+- Pages: 6 dashboard pages
+- Agent Tools: 6 Q&A tools, 5 discovery methods, 3 integration methods
+- Test Suite: 6 hallucination tests against Parquet ground truth
