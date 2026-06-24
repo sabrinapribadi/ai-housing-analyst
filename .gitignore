@@ -1,7 +1,13 @@
-# Data files (too large for GitHub)
+# Raw data — too large for GitHub (calendar 376 MB, reviews 279 MB, listings 77 MB)
 data/raw/*.csv
 data/raw/*.geojson
-data/processed/*.parquet
+# Allow the tiny neighbourhood files (< 1 MB each)
+!data/raw/neighbourhoods.csv
+!data/raw/neighbourhoods.geojson
+
+# Processed data — Parquet files ARE committed (compressed and deployment-ready)
+# Uncomment the line below only if you want to exclude them again:
+# data/processed/*.parquet
 data/processed/*.csv
 
 # Virtual environment
