@@ -103,8 +103,48 @@ class AirbnbAgent:
             rec = rec[rec["count"] >= 10].sort_values("avg_rating", ascending=False).head(10)
             return rec.to_string()
 
+        @tool
+        def get_review_stats() -> str:
+            """Get review score statistics for Tokyo Airbnb listings.
+            Returns average and median for the overall rating and all six
+            sub-category scores (accuracy, cleanliness, check-in,
+            communication, location, value), plus rating distribution."""
+            score_cols = [
+                "review_scores_rating",
+                "review_scores_accuracy",
+                "review_scores_cleanliness",
+                "review_scores_checkin",
+                "review_scores_communication",
+                "review_scores_location",
+                "review_scores_value",
+            ]
+            result = {}
+            for col in score_cols:
+                if col not in self.listings.columns:
+                    continue
+                s = self.listings[col].dropna()
+                label = col.replace("review_scores_", "")
+                result[label] = {
+                    "mean":   round(float(s.mean()), 2),
+                    "median": round(float(s.median()), 2),
+                    "count":  int(len(s)),
+                }
+            # Overall rating distribution (bands on 1-5 scale)
+            if "review_scores_rating" in self.listings.columns:
+                r = self.listings["review_scores_rating"].dropna()
+                result["rating_distribution"] = {
+                    "5.0 (excellent)":    int((r == 5.0).sum()),
+                    "4.5–4.9 (great)":    int(((r >= 4.5) & (r < 5.0)).sum()),
+                    "4.0–4.4 (good)":     int(((r >= 4.0) & (r < 4.5)).sum()),
+                    "below 4.0 (fair)":   int((r < 4.0).sum()),
+                }
+                result["reviewed_listings"] = int(len(r))
+                result["total_listings"]    = int(len(self.listings))
+            return json.dumps(result, indent=2)
+
         return [
             get_summary_stats,
+            get_review_stats,
             plot_price_distribution,
             plot_price_by_neighborhood,
             plot_price_by_room_type,
