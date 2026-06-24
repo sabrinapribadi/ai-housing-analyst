@@ -176,6 +176,27 @@ st.markdown("""
 
 
 # ── Data loaders ───────────────────────────────────────────────────────────────
+def _ensure_processed() -> bool:
+    """Run the data pipeline if processed Parquet files are missing.
+    Returns True when data is ready, False if raw files are also missing."""
+    from pathlib import Path
+    if Path("data/processed/listings_processed.parquet").exists():
+        return True
+    if not Path("data/raw/listings.csv").exists():
+        return False
+    Path("data/processed").mkdir(parents=True, exist_ok=True)
+    from src.data.loader import DataLoader
+    from src.data.cleaner import DataCleaner
+    from src.data.feature_engineer import FeatureEngineer
+    raw   = DataLoader().load_all(sample_listings=None, sample_calendar=50_000, sample_reviews=20_000)
+    clean = DataCleaner().clean_all(raw)
+    final = FeatureEngineer().engineer_all(clean)
+    final["listings"].to_parquet("data/processed/listings_processed.parquet")
+    final["calendar"].to_parquet("data/processed/calendar_processed.parquet")
+    final["reviews"].to_parquet("data/processed/reviews_processed.parquet")
+    return True
+
+
 @st.cache_data
 def load_data() -> pd.DataFrame:
     return pd.read_parquet("data/processed/listings_processed.parquet")
@@ -220,7 +241,22 @@ def load_agent() -> AirbnbAgent:
 if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
 
-# ── Load data ──────────────────────────────────────────────────────────────────
+# ── Load data (auto-process on first run) ─────────────────────────────────────
+from pathlib import Path as _Path
+if not _Path("data/processed/listings_processed.parquet").exists():
+    if not _Path("data/raw/listings.csv").exists():
+        st.error(
+            "Raw data not found. Download the Tokyo dataset from "
+            "[Inside Airbnb](https://insideairbnb.com/get-the-data/) and place "
+            "`listings.csv`, `reviews.csv`, `calendar.csv`, and "
+            "`neighbourhoods.geojson` under `data/raw/`."
+        )
+        st.stop()
+    with st.spinner("Processing data for the first time — this takes 1–2 minutes…"):
+        _ensure_processed()
+    st.success("Data processed and cached. Reloading…")
+    st.rerun()
+
 df = load_data()
 eda = EDAAnalyzer(df)
 clusterer = GeospatialClusterer(df)
