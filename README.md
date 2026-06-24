@@ -7,7 +7,7 @@ An end-to-end data analytics and AI platform for exploring the Tokyo Airbnb mark
 | Page | What it does |
 |------|-------------|
 | **Dashboard** | Key market metrics, annotated price histogram, neighbourhood treemap, price vs rating scatter, box plot, rule-based price predictor |
-| **AI Assistant** | Natural language Q&A powered by LangChain + GPT-4o-mini; generated charts appear inline in the chat |
+| **AI Assistant** | Natural language Q&A powered by LangChain + GPT-4o-mini; 8 tools covering prices, review scores (7 sub-dimensions), neighbourhood charts (cheapest or most expensive), clustering, and recommendations; generated charts appear inline in the chat |
 | **Maps** | Choropleth by avg price with hover tooltips, listing density heatmap, MarkerCluster with rich popups — dark tile base with a layer guide panel |
 | **Sentiment Analysis** | TextBlob scoring on up to 100,000 reviews per filter (cached); Most Positive / Most Negative tabs filter by genuine label (> 0.1 / < −0.1); inline disclaimer explains translation artefacts and mixed-sentiment scoring |
 | **Data Explorer** | Column selector, configurable row count, smart number formatting (thousands separators, smart decimals), distribution viewer, data quality chart, neighbourhood comparison |
@@ -21,7 +21,7 @@ ai-housing-analyst/
 │   └── config.toml              # Dark theme + Airbnb coral accent
 ├── src/
 │   ├── agent/
-│   │   ├── agent.py             # LangChain Q&A agent (6 tools)
+│   │   ├── agent.py             # LangChain Q&A agent (8 tools)
 │   │   └── discovery_agent.py   # DataDiscoveryAgent: auto-discovery + data integration
 │   ├── analytics/
 │   │   ├── eda.py               # EDA plot functions (Matplotlib)

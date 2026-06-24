@@ -1,6 +1,6 @@
 PRODUCT REQUIREMENT DOCUMENT (PRD)
 Project: AI Housing Market Analyst – An LLM-Powered Data Agent
-Version: 4.1 (Polish — Data Quality & Sentiment UX)
+Version: 4.2 (Agent Tool Completeness)
 Author: Sabrina Pribadi
 Date: June 25, 2026
 Status: Completed
@@ -117,8 +117,17 @@ Module B: Analytics & Modelling
 
 Module C: Q&A Agent (AirbnbAgent)
 - C.1 Agent Framework: LangChain with LangGraph (v1.3 compatible).
-- C.2 Tools Provided: 6 tools — summary stats, price plots, neighbourhood plot, room type
-      plot, cluster summary, neighbourhood recommendation.
+- C.2 Tools Provided: 8 tools —
+      · get_summary_stats: total listings, avg/median price, top-5 expensive/cheapest districts
+      · get_review_stats: mean + median for all 7 review score dimensions (overall, accuracy,
+        cleanliness, check-in, communication, location, value) and rating distribution bands
+      · plot_price_distribution: annotated price histogram
+      · plot_price_by_neighborhood(order): bar chart of top-10 most expensive or cheapest
+        neighbourhoods; order='expensive' (default) or order='cheapest' — chart title,
+        bar colour, and output filename all reflect the requested direction
+      · plot_price_by_room_type: price breakdown by room type
+      · get_cluster_summary: K-Means market segment summary
+      · recommend_neighborhood(budget, room_type): top-10 districts by rating within budget
 - C.3 Model: GPT-4o-mini.
 - C.4 Prompting: System prompt with data analyst persona.
 - C.5 Safety: Error handling, max iterations = 5.
@@ -293,7 +302,7 @@ Data Pipeline:
           |                          |                          |
 +---------+---------+    +-----------+-----------+    +--------+--------+
 | AirbnbAgent       |    | DataDiscoveryAgent    |    | HallucinationD. |
-| (Q&A, 6 tools)    |    | (Discovery+Integrate) |    | (Test suite)    |
+| (Q&A, 8 tools)    |    | (Discovery+Integrate) |    | (Test suite)    |
 | LangChain/LangGrph|    | GPT-4o-mini + difflib |    | Ground truth vs |
 +---+---+---+---+---+    +-----------+-----------+    | Parquet values  |
     |   |   |   |                    |                 +-----------------+
@@ -318,6 +327,8 @@ Data Pipeline:
 | 1      | 3 days   | Data loading, cleaning, feature engineering                   | Completed |
 | 2      | 3 days   | EDA functions, geospatial clustering                          | Completed |
 | 3      | 4 days   | LangChain Q&A agent with 6 tools                              | Completed |
+| 8b     | 0.5 days | Agent tool completeness: get_review_stats (7 dimensions),     | Completed |
+|        |          | plot_price_by_neighborhood order param (expensive/cheapest)   |           |
 | 4      | 3 days   | Streamlit dashboard with 5 pages                              | Completed |
 | 5      | 2 days   | Deployment, README, documentation                             | Completed |
 | 6      | 2 days   | UI/UX: dark theme, golden ratio, Plotly charts, enhanced maps | Completed |
@@ -408,5 +419,5 @@ Additional criteria met:
   GeoPandas, Folium, Plotly, langdetect, deep-translator, TextBlob, difflib
 - Agents: AirbnbAgent (Q&A), DataDiscoveryAgent (discovery + integration)
 - Pages: 6 dashboard pages
-- Agent Tools: 6 Q&A tools, 5 discovery methods, 3 integration methods
+- Agent Tools: 8 Q&A tools, 5 discovery methods, 3 integration methods
 - Test Suite: 6 hallucination tests against Parquet ground truth
