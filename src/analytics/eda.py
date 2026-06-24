@@ -95,35 +95,38 @@ class EDAAnalyzer:
         plt.show()
         return "displayed"
 
-    def plot_price_by_neighborhood(self, top_n: int = 10, save: bool = True) -> str:
-        """Plot average price by top neighborhoods."""
+    def plot_price_by_neighborhood(self, top_n: int = 10, order: str = "expensive", save: bool = True) -> str:
+        """Plot average price by neighbourhood. order='expensive' or 'cheapest'."""
         if 'neighbourhood_cleansed' not in self.listings.columns:
             return "Neighborhood data not available"
-        
-        # Group by neighborhood
+
+        cheapest = (order == "cheapest")
         nb_prices = self.listings.groupby('neighbourhood_cleansed')['price'].agg(['mean', 'count'])
-        nb_prices = nb_prices.sort_values('mean', ascending=False).head(top_n)
-        
+        nb_prices = nb_prices.sort_values('mean', ascending=cheapest).head(top_n)
+
+        title = f'Top {top_n} {"Cheapest" if cheapest else "Most Expensive"} Neighborhoods'
+        color = '#5BC8AF' if cheapest else 'skyblue'
+
         fig, ax = plt.subplots(figsize=(12, 6))
-        nb_prices['mean'].plot(kind='bar', ax=ax, color='skyblue')
-        ax.set_title(f'Top {top_n} Most Expensive Neighborhoods')
+        nb_prices['mean'].plot(kind='bar', ax=ax, color=color)
+        ax.set_title(title)
         ax.set_ylabel('Average Price (JPY)')
         ax.set_xlabel('Neighborhood')
         ax.tick_params(axis='x', rotation=45)
-        
-        # Add count annotations
+
         for i, (idx, row) in enumerate(nb_prices.iterrows()):
-            ax.text(i, row['mean'] + 1000, f"n={int(row['count'])}", ha='center', fontsize=8)
-        
+            ax.text(i, row['mean'] + 200, f"n={int(row['count'])}", ha='center', fontsize=8)
+
         plt.tight_layout()
-        
+
         if save:
-            path = self.output_dir / 'price_by_neighborhood.png'
+            filename = 'price_by_neighborhood_cheapest.png' if cheapest else 'price_by_neighborhood.png'
+            path = self.output_dir / filename
             plt.savefig(path, dpi=150, bbox_inches='tight')
             plt.close(fig)
             logger.info(f"💾 Saved to {path}")
             return str(path)
-        
+
         plt.show()
         return "displayed"
 

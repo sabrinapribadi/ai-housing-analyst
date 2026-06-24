@@ -68,10 +68,12 @@ class AirbnbAgent:
             return f"Price distribution plot saved to: {path}"
 
         @tool
-        def plot_price_by_neighborhood() -> str:
-            """Generate a bar chart of average prices by neighbourhood."""
-            path = self.eda.plot_price_by_neighborhood()
-            return f"Price by neighbourhood plot saved to: {path}"
+        def plot_price_by_neighborhood(order: str = "expensive") -> str:
+            """Generate a bar chart of average prices by neighbourhood.
+            Pass order='expensive' for the most expensive neighbourhoods (default),
+            or order='cheapest' for the cheapest neighbourhoods."""
+            path = self.eda.plot_price_by_neighborhood(order=order)
+            return f"Price by neighbourhood ({order}) plot saved to: {path}"
 
         @tool
         def plot_price_by_room_type() -> str:
