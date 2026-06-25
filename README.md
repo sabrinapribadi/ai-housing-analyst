@@ -7,7 +7,7 @@ An end-to-end data analytics and AI platform for exploring the Tokyo Airbnb mark
 | Page | What it does |
 |------|-------------|
 | **Dashboard** | Key market metrics, annotated price histogram, neighbourhood treemap, price vs rating scatter, box plot, rule-based price predictor |
-| **AI Assistant** | Natural language Q&A powered by LangChain + GPT-4o-mini; 8 tools covering prices, review scores (7 sub-dimensions), neighbourhood charts (cheapest or most expensive), clustering, and recommendations; generated charts appear inline in the chat |
+| **AI Assistant** | Two tabs: **Chat with Agent** — natural language Q&A via LangChain + GPT-4o-mini (8 tools, inline charts); **Ask the Reviews (RAG)** — semantic search over 25,000 embedded reviews via ChromaDB + OpenAI text-embedding-3-small, answers grounded in retrieved guest review text |
 | **Maps** | Choropleth by avg price with hover tooltips, listing density heatmap, MarkerCluster with rich popups — dark tile base with a layer guide panel |
 | **Sentiment Analysis** | TextBlob scoring on up to 100,000 reviews per filter (cached); Most Positive / Most Negative tabs filter by genuine label (> 0.1 / < −0.1); inline disclaimer explains translation artefacts and mixed-sentiment scoring |
 | **Data Explorer** | Column selector, configurable row count, smart number formatting (thousands separators, smart decimals), distribution viewer, data quality chart, neighbourhood comparison |
@@ -22,6 +22,7 @@ ai-housing-analyst/
 ├── src/
 │   ├── agent/
 │   │   ├── agent.py             # LangChain Q&A agent (8 tools)
+│   │   ├── rag_agent.py         # ReviewRAGAgent: ChromaDB + OpenAI embeddings RAG
 │   │   └── discovery_agent.py   # DataDiscoveryAgent: auto-discovery + data integration
 │   ├── analytics/
 │   │   ├── eda.py               # EDA plot functions (Matplotlib)
@@ -32,7 +33,10 @@ ai-housing-analyst/
 │       └── dashboard.py         # Streamlit 6-page app
 ├── scripts/
 │   ├── save_processed_data.py   # Run once to build Parquet files
+│   ├── build_review_index.py    # Run once to build ChromaDB RAG index (~$0.05)
 │   └── train_forecast.py        # Train and serialise the forecast model
+├── data/
+│   └── chroma/                  # Pre-built ChromaDB vector store (85 MB, committed)
 ├── tests/
 │   ├── test_hallucination.py    # Automated hallucination detection suite
 │   └── hallucination_checklist.md
@@ -100,6 +104,17 @@ Opens at `http://localhost:8501`.
 > **Note:** Use `python -m streamlit run` (not `poetry run streamlit run`) to ensure all
 > pip-installed extras are resolved from the same Python environment.
 
+## Rebuilding the RAG Index
+
+The pre-built ChromaDB index (`data/chroma/`) is committed to the repo and works out of the box. To rebuild it (e.g. after adding more reviews):
+
+```bash
+python scripts/build_review_index.py          # build (skips if already exists)
+python scripts/build_review_index.py --rebuild # force full rebuild
+```
+
+Cost: ~$0.05 one-time (25,000 reviews × ~100 tokens × text-embedding-3-small pricing).
+
 ## Running Tests
 
 The hallucination detection suite fires 6 standard questions at the live agent and compares
@@ -151,6 +166,7 @@ textColor                = "#F0F0F0"
 | Charts          | Plotly Express / Graph Objects                                            |
 | Maps            | Folium, streamlit-folium, folium.plugins (HeatMap, MarkerCluster)         |
 | AI / Agent      | LangChain, LangGraph, OpenAI GPT-4o-mini                                  |
+| RAG             | ChromaDB (vector store), OpenAI text-embedding-3-small (256-dim)          |
 | ML              | scikit-learn (K-Means), Prophet                                           |
 | Data            | Pandas, NumPy, GeoPandas                                                  |
 | NLP             | TextBlob (sentiment), langdetect, deep-translator                         |
