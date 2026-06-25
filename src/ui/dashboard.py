@@ -675,10 +675,11 @@ elif page == "AI Assistant":
 
             st.markdown("**Quick questions**")
             rag_cols = st.columns(3)
-            rag_preset = None
             for i, q in enumerate(RAG_PRESETS):
                 if rag_cols[i % 3].button(q, key=f"rag_preset_{i}", use_container_width=True):
-                    rag_preset = q
+                    st.session_state["rag_question"] = q
+                    st.session_state["rag_run_search"] = True
+                    st.rerun()
 
             st.markdown("---")
 
@@ -686,7 +687,6 @@ elif page == "AI Assistant":
             with q_col:
                 rag_q = st.text_input(
                     "Question",
-                    value=rag_preset or "",
                     placeholder="What do guests complain about in Shinjuku?",
                     key="rag_question",
                 )
@@ -696,7 +696,10 @@ elif page == "AI Assistant":
                 )
                 rag_nb = st.selectbox("Filter by neighbourhood", nb_options, key="rag_nb")
 
-            if st.button("Search Reviews", type="primary", key="rag_search") and rag_q:
+            manual_search = st.button("Search Reviews", type="primary", key="rag_search")
+            auto_search   = st.session_state.pop("rag_run_search", False)
+
+            if (manual_search or auto_search) and rag_q:
                 nb_filter = "" if rag_nb == "All neighbourhoods" else rag_nb
                 with st.spinner("Searching 25,000 reviews…"):
                     result = rag_agent.query(rag_q, neighbourhood=nb_filter, n_results=10)
