@@ -165,6 +165,7 @@ textColor                = "#F0F0F0"
 | Frontend        | Streamlit 1.58, Material Icons                                            |
 | Charts          | Plotly Express / Graph Objects                                            |
 | Maps            | Folium, streamlit-folium, folium.plugins (HeatMap, MarkerCluster)         |
+| Icons           | Streamlit Material icons (:material/\*), inline SVG for Folium popups     |
 | AI / Agent      | LangChain, LangGraph, OpenAI GPT-4o-mini                                  |
 | RAG             | ChromaDB (vector store), OpenAI text-embedding-3-small (256-dim)          |
 | ML              | scikit-learn (K-Means), Prophet                                           |
