@@ -237,6 +237,16 @@ def load_agent() -> AirbnbAgent:
     return AirbnbAgent()
 
 
+@st.cache_resource
+def load_rag_agent():
+    try:
+        from src.agent.rag_agent import ReviewRAGAgent
+        agent = ReviewRAGAgent()
+        return agent if agent.is_index_built() else None
+    except Exception:
+        return None
+
+
 # ── Session state ──────────────────────────────────────────────────────────────
 if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
@@ -572,65 +582,139 @@ elif page == "AI Assistant":
 
     agent = load_agent()
 
-    PRESETS = [
-        "What's the average price in Tokyo?",
-        "Which neighbourhoods are most expensive?",
-        "What are the cheapest neighbourhoods?",
-        "Recommend neighbourhoods under ¥20,000",
-        "Show the price distribution by room type",
-        "What's the average review score?",
-    ]
+    tab_chat, tab_rag = st.tabs(["Chat with Agent", "Ask the Reviews (RAG)"])
 
-    st.markdown("**Quick questions**")
-    cols = st.columns(3)
-    preset_clicked = None
-    for i, q in enumerate(PRESETS):
-        if cols[i % 3].button(q, key=f"preset_{i}", use_container_width=True):
-            preset_clicked = q
+    # ── Tab 1: existing LLM-with-tools chat ───────────────────────────────────
+    with tab_chat:
+        PRESETS = [
+            "What's the average price in Tokyo?",
+            "Which neighbourhoods are most expensive?",
+            "What are the cheapest neighbourhoods?",
+            "Recommend neighbourhoods under ¥20,000",
+            "Show the price distribution by room type",
+            "What's the average review score?",
+        ]
 
-    st.markdown("---")
+        st.markdown("**Quick questions**")
+        cols = st.columns(3)
+        preset_clicked = None
+        for i, q in enumerate(PRESETS):
+            if cols[i % 3].button(q, key=f"preset_{i}", use_container_width=True):
+                preset_clicked = q
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+        st.markdown("---")
 
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
-            for plot_path in msg.get("plots", []):
-                if os.path.exists(plot_path):
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+                for plot_path in msg.get("plots", []):
+                    if os.path.exists(plot_path):
+                        st.image(plot_path, use_container_width=True)
+
+        user_input = st.chat_input("Ask a question...") or preset_clicked
+
+        if user_input:
+            st.session_state.messages.append({"role": "user", "content": user_input})
+            with st.chat_message("user"):
+                st.markdown(user_input)
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    call_time = time.time()
+                    response  = agent.ask(user_input)
+                st.markdown(response)
+
+                new_plots = sorted(
+                    [p for p in glob.glob("outputs/*.png")
+                     if os.path.getmtime(p) >= call_time - 1],
+                    key=os.path.getmtime,
+                )
+                for plot_path in new_plots:
                     st.image(plot_path, use_container_width=True)
 
-    user_input = st.chat_input("Ask a question...") or preset_clicked
-
-    if user_input:
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        with st.chat_message("user"):
-            st.markdown(user_input)
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                call_time = time.time()
-                response  = agent.ask(user_input)
-            st.markdown(response)
-
-            # Show any plots the agent generated during this call
-            new_plots = sorted(
-                [
-                    p for p in glob.glob("outputs/*.png")
-                    if os.path.getmtime(p) >= call_time - 1
-                ],
-                key=os.path.getmtime,
+            st.session_state.messages.append(
+                {"role": "assistant", "content": response, "plots": new_plots}
             )
-            for plot_path in new_plots:
-                st.image(plot_path, use_container_width=True)
 
-        st.session_state.messages.append(
-            {"role": "assistant", "content": response, "plots": new_plots}
+        if st.session_state.messages:
+            if st.button("Clear conversation"):
+                st.session_state.messages = []
+                st.rerun()
+
+    # ── Tab 2: RAG — semantic review search ───────────────────────────────────
+    with tab_rag:
+        st.markdown(
+            "Ask qualitative questions answered directly from **25,000 real guest reviews** "
+            "retrieved via semantic vector search — not aggregated stats."
+        )
+        st.caption(
+            "Powered by OpenAI text-embedding-3-small (256-dim) + ChromaDB + GPT-4o-mini synthesis."
         )
 
-    if st.session_state.messages:
-        if st.button("Clear conversation"):
-            st.session_state.messages = []
-            st.rerun()
+        rag_agent = load_rag_agent()
+
+        if rag_agent is None:
+            st.warning(
+                "**Review index not found.** "
+                "Run `python scripts/build_review_index.py` locally, then commit "
+                "the `data/chroma/` directory to enable this feature."
+            )
+        else:
+            st.caption(f"Index: {rag_agent.index_count():,} reviews embedded")
+
+            RAG_PRESETS = [
+                "What do guests complain about most?",
+                "What do guests love about staying in Tokyo?",
+                "What are common issues with cleanliness?",
+                "What do people say about the location and transport?",
+                "What makes a highly rated listing?",
+                "What do guests say about communication with hosts?",
+            ]
+
+            st.markdown("**Quick questions**")
+            rag_cols = st.columns(3)
+            rag_preset = None
+            for i, q in enumerate(RAG_PRESETS):
+                if rag_cols[i % 3].button(q, key=f"rag_preset_{i}", use_container_width=True):
+                    rag_preset = q
+
+            st.markdown("---")
+
+            q_col, nb_col = st.columns([3, 1])
+            with q_col:
+                rag_q = st.text_input(
+                    "Question",
+                    value=rag_preset or "",
+                    placeholder="What do guests complain about in Shinjuku?",
+                    key="rag_question",
+                )
+            with nb_col:
+                nb_options = ["All neighbourhoods"] + sorted(
+                    df["neighbourhood_cleansed"].dropna().unique().tolist()
+                )
+                rag_nb = st.selectbox("Filter by neighbourhood", nb_options, key="rag_nb")
+
+            if st.button("Search Reviews", type="primary", key="rag_search") and rag_q:
+                nb_filter = "" if rag_nb == "All neighbourhoods" else rag_nb
+                with st.spinner("Searching 25,000 reviews…"):
+                    result = rag_agent.query(rag_q, neighbourhood=nb_filter, n_results=10)
+
+                st.markdown("### Answer")
+                st.markdown(result["answer"])
+
+                if result["sources"]:
+                    st.markdown("### Source Reviews")
+                    st.caption(
+                        "Retrieved by semantic similarity — expand to read the actual review text."
+                    )
+                    for src in result["sources"]:
+                        label = (
+                            f"{src['neighbourhood']}  ·  similarity {src['similarity']:.2f}"
+                        )
+                        with st.expander(label):
+                            st.write(src["text"])
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
