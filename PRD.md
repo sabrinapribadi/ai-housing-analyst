@@ -1,6 +1,6 @@
 PRODUCT REQUIREMENT DOCUMENT (PRD)
 Project: AI Housing Market Analyst – An LLM-Powered Data Agent
-Version: 5.1 (RAG UX Polish)
+Version: 5.2 (Code Quality — De-emoji Pass)
 Author: Sabrina Pribadi
 Date: June 25, 2026
 Status: Completed
@@ -278,6 +278,8 @@ Module F: Hallucination Detection (tests/test_hallucination.py)
   so the app functions without an API key.
 - Code Quality: Modular structure (src/analytics/, src/agent/, src/data/, src/ui/).
   Helper functions (_chart, _clean_review, _translate, _theme, _narrate) centralised.
+  No emoji in any source file — scripts use plain-text logging; dashboard uses
+  Material icons and inline SVG for all visual indicators.
 - Theme: Consistent dark theme via config.toml; primaryColor #FF5A5F (Airbnb coral).
 - Documentation: Complete README.md and PRD.md kept in sync with each sprint.
 - Version Control: Clean Git history on GitHub.
@@ -366,6 +368,9 @@ Data Pipeline:
 | 10     | 0.5 days | RAG UX polish: preset buttons auto-trigger search via session | Completed |
 |        |          | state; source reviews auto-translated (langdetect +           |           |
 |        |          | deep-translator) with original in nested expander             |           |
+| 11     | 0.5 days | Code quality: remove all emoji from scripts and logger calls; | Completed |
+|        |          | replace dashboard emoji with Material icons (:material/home:, |           |
+|        |          | :material/info:) and inline SVG icons in Folium map popups    |           |
 
 
 10. TESTING STRATEGY
