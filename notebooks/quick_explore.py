@@ -19,7 +19,7 @@ engineer = FeatureEngineer()
 final_data = engineer.engineer_all(cleaned_data)
 
 df = final_data['listings']
-print(f"\n✅ Done! {len(df):,} listings loaded.")
+print(f"\nDone. {len(df):,} listings loaded.")
 print(f"Columns: {len(df.columns)}")
 print(f"Memory: {df.memory_usage(deep=True).sum() / 1024**2:.1f} MB")
 print(f"\nPrice stats:")
