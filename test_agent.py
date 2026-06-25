@@ -2,7 +2,7 @@ import sys
 sys.path.append('.')
 from src.agent.agent import AirbnbAgent
 
-print("🤖 Initializing Airbnb Agent...")
+print("Initializing Airbnb Agent...")
 agent = AirbnbAgent()
 
 questions = [
@@ -14,7 +14,7 @@ questions = [
 
 for q in questions:
     print("\n" + "=" * 60)
-    print(f"❓ Question: {q}")
+    print(f"Question: {q}")
     print("=" * 60)
     response = agent.ask(q)
-    print(f"🤖 Response:\n{response}")
+    print(f"Response:\n{response}")

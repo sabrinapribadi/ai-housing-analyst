@@ -43,7 +43,7 @@ class DataCleaner:
         
         # Log if all values are NaN
         if result.isna().all():
-            logger.warning("⚠️ All prices are NaN after cleaning. Check raw data format.")
+            logger.warning("All prices are NaN after cleaning. Check raw data format.")
         
         return result
 
@@ -139,7 +139,7 @@ class DataCleaner:
             logger.info(f"   Price column cleaned: {non_null:,} non-null values")
             
             if non_null == 0:
-                logger.error("⚠️ Still no valid prices! Please check raw data format.")
+                logger.error("Still no valid prices. Please check raw data format.")
 
         if 'adjusted_price' in df_clean.columns:
             df_clean['adjusted_price'] = self.clean_price(df_clean['adjusted_price'])
@@ -148,7 +148,7 @@ class DataCleaner:
         if 'available' in df_clean.columns:
             df_clean['available'] = df_clean['available'].map({'t': True, 'f': False})
 
-        logger.info(f"✅ Calendar cleaned: {len(df_clean):,} rows")
+        logger.info(f"Calendar cleaned: {len(df_clean):,} rows")
         return df_clean
 
     def clean_reviews(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -210,19 +210,19 @@ class DataCleaner:
             if sample_calendar:
                 calendar_sample = data['calendar'].sample(n=min(100000, len(data['calendar'])), random_state=42)
                 cleaned['calendar'] = self.clean_calendar(calendar_sample)
-                logger.info(f"💡 Calendar sampled to {len(cleaned['calendar']):,} rows")
+                logger.info(f"Calendar sampled to {len(cleaned['calendar']):,} rows")
             else:
                 cleaned['calendar'] = self.clean_calendar(data['calendar'])
-                logger.info(f"✅ Calendar kept all {len(cleaned['calendar']):,} rows")
+                logger.info(f"Calendar kept all {len(cleaned['calendar']):,} rows")
 
         if 'reviews' in data:
             if sample_reviews:
                 reviews_sample = data['reviews'].sample(n=min(50000, len(data['reviews'])), random_state=42)
                 cleaned['reviews'] = self.clean_reviews(reviews_sample)
-                logger.info(f"💡 Reviews sampled to {len(cleaned['reviews']):,} rows")
+                logger.info(f"Reviews sampled to {len(cleaned['reviews']):,} rows")
             else:
                 cleaned['reviews'] = self.clean_reviews(data['reviews'])
-                logger.info(f"✅ Reviews kept all {len(cleaned['reviews']):,} rows")
+                logger.info(f"Reviews kept all {len(cleaned['reviews']):,} rows")
 
         # Pass through unchanged
         if 'neighbourhoods' in data:
@@ -232,7 +232,7 @@ class DataCleaner:
             cleaned['neighbourhoods_geojson'] = data['neighbourhoods_geojson']
 
         logger.info("=" * 50)
-        logger.info("✅ All data cleaned!")
+        logger.info("All data cleaned.")
         logger.info("=" * 50)
 
         return cleaned

@@ -118,7 +118,7 @@ class DataLoader:
         if sample:
             df = df.sample(n=min(sample, len(df)), random_state=42)
         
-        logger.info(f"✅ Loaded {len(df):,} recent reviews")
+        logger.info(f"Loaded {len(df):,} recent reviews")
         return df
 
     def load_neighbourhoods(self) -> pd.DataFrame:
@@ -168,7 +168,7 @@ class DataLoader:
         }
         
         logger.info("=" * 50)
-        logger.info("✅ All data loaded successfully!")
+        logger.info("All data loaded successfully.")
         logger.info("=" * 50)
         
         return self.data

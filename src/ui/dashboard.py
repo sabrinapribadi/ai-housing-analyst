@@ -42,7 +42,7 @@ except ImportError:
 # ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Airbnb Tokyo Analytics",
-    page_icon="🏠",
+    page_icon=":material/home:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -274,7 +274,7 @@ clusterer = GeospatialClusterer(df)
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### 🏠 Tokyo Airbnb")
+    st.markdown(":material/home: **Tokyo Airbnb**")
     st.markdown("---")
 
     # Icon-button navigation — Material icons (Streamlit 1.36+)
@@ -828,7 +828,29 @@ elif page == "Maps":
         )
         for _, row in sample.iterrows():
             rating     = row.get("review_scores_rating", None)
-            rating_str = f"⭐ {rating:.1f}" if pd.notna(rating) else "No rating yet"
+            _star_svg = (
+                "<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' "
+                "viewBox='0 0 24 24' fill='#FF5A5F' style='vertical-align:middle'>"
+                "<path d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 "
+                "9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/></svg>"
+            )
+            _pin_svg = (
+                "<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' "
+                "viewBox='0 0 24 24' fill='#888' style='vertical-align:middle'>"
+                "<path d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13"
+                "c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 "
+                "2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/></svg>"
+            )
+            _cal_svg = (
+                "<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' "
+                "viewBox='0 0 24 24' fill='#888' style='vertical-align:middle'>"
+                "<path d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19"
+                "c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h"
+                "14v11zM7 10h5v5H7z'/></svg>"
+            )
+            rating_str = (
+                f"{_star_svg} {rating:.1f}" if pd.notna(rating) else "No rating yet"
+            )
             avail      = int(row["availability_365"]) if pd.notna(row.get("availability_365")) else "—"
             popup_html = f"""
                 <div style="font-family:Arial;font-size:12px;min-width:190px;padding:4px">
@@ -838,8 +860,8 @@ elif page == "Maps":
                     </b><br>
                     <span style="color:#666;font-size:11px">{row.get('room_type', '')}</span>
                     <hr style="margin:5px 0;border-color:#ddd">
-                    {rating_str}&nbsp;·&nbsp;📍 {row.get('neighbourhood_cleansed', '')}<br>
-                    <span style="color:#888">📅 {avail} days available / year</span>
+                    {rating_str}&nbsp;·&nbsp;{_pin_svg} {row.get('neighbourhood_cleansed', '')}<br>
+                    <span style="color:#888">{_cal_svg} {avail} days available / year</span>
                 </div>
             """
             folium.CircleMarker(
@@ -1244,7 +1266,7 @@ elif page == "Sentiment Analysis":
                 "(e.g. *great location, but cleanliness issues*) scores lower overall, "
                 "even when the guest's net impression was positive.\n\n"
                 "Treat the polarity score as a rough signal, not a verdict — always read the full text.",
-                icon="ℹ️",
+                icon=":material/info:",
             )
             for _, row in neg_reviews.iterrows():
                 _render_review(row, positive=False)

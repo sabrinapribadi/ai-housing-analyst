@@ -58,7 +58,7 @@ class PriceForecaster:
         upper_limit = daily_avg['y'].quantile(0.95)
         daily_avg = daily_avg[daily_avg['y'] <= upper_limit]
 
-        logger.info(f"✅ Prepared {len(daily_avg):,} daily records for forecasting")
+        logger.info(f"Prepared {len(daily_avg):,} daily records for forecasting")
         if neighborhood:
             logger.info(f"   Neighborhood: {neighborhood}")
         else:
@@ -79,7 +79,7 @@ class PriceForecaster:
             Dictionary with model, forecast, and metrics
         """
         logger.info("=" * 60)
-        logger.info(f"📈 Training Prophet model for: {neighborhood or 'All Tokyo'}")
+        logger.info(f"Training Prophet model for: {neighborhood or 'All Tokyo'}")
         logger.info("=" * 60)
 
         # Prepare data
@@ -103,7 +103,7 @@ class PriceForecaster:
         )
 
         # Fit model
-        logger.info("🔄 Training model...")
+        logger.info("Training model...")
         self.model.fit(df)
 
         # Create future dataframe
@@ -118,7 +118,7 @@ class PriceForecaster:
             'date_range': f"{df['ds'].min()} to {df['ds'].max()}",
         }
 
-        logger.info(f"✅ Model trained successfully!")
+        logger.info("Model trained successfully.")
         logger.info(f"   Training days: {len(df):,}")
         logger.info(f"   Forecast days: {forecast_days}")
 
@@ -141,7 +141,7 @@ class PriceForecaster:
         model_path = self.models_dir / filename
         with open(model_path, 'wb') as f:
             pickle.dump(self.model, f)
-        logger.info(f"💾 Model saved to {model_path}")
+        logger.info(f"Model saved to {model_path}")
 
     def load_model(self, filename: str = "prophet_model.pkl"):
         """Load a saved model."""
@@ -151,7 +151,7 @@ class PriceForecaster:
 
         with open(model_path, 'rb') as f:
             self.model = pickle.load(f)
-        logger.info(f"📂 Model loaded from {model_path}")
+        logger.info(f"Model loaded from {model_path}")
 
     def forecast_for_neighborhood(self, neighborhood: str,
                                   days: int = 90) -> pd.DataFrame:
@@ -165,7 +165,7 @@ class PriceForecaster:
         Returns:
             DataFrame with forecast
         """
-        logger.info(f"🔮 Forecasting for {neighborhood}...")
+        logger.info(f"Forecasting for {neighborhood}...")
         result = self.train(neighborhood, days)
         return result['forecast'][['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 

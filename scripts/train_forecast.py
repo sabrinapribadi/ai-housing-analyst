@@ -16,11 +16,11 @@ logger = logging.getLogger(__name__)
 
 def main():
     print("=" * 60)
-    print("📈 TRAINING FORECASTING MODELS")
+    print("TRAINING FORECASTING MODELS")
     print("=" * 60)
 
     # 1. Load processed calendar data
-    print("\n📂 Loading calendar data...")
+    print("\nLoading calendar data...")
     calendar_df = pd.read_parquet("data/processed/calendar_processed.parquet")
     print(f"   Loaded {len(calendar_df):,} calendar entries")
 
@@ -31,7 +31,7 @@ def main():
     listings = pd.read_parquet("data/processed/listings_processed.parquet")
     top_neighborhoods = listings['neighbourhood_cleansed'].value_counts().head(5).index.tolist()
 
-    print(f"\n🏠 Training models for top 5 neighborhoods:")
+    print(f"\nTraining models for top 5 neighborhoods:")
     for nb in top_neighborhoods:
         print(f"   - {nb}")
 
@@ -50,13 +50,13 @@ def main():
 
     # 6. Save summary
     print("\n" + "=" * 60)
-    print("📊 FORECAST SUMMARY")
+    print("FORECAST SUMMARY")
     print("=" * 60)
 
     for name, result in results.items():
         metrics = result['metrics']
         summary = forecaster.get_forecast_summary(result['forecast'])
-        print(f"\n📍 {name}:")
+        print(f"\n{name}:")
         print(f"   Training days: {metrics['training_days']:,}")
         print(f"   Avg forecast price: ¥{summary['avg_forecast_price']:,.0f}")
         print(f"   Trend: {summary['trend_direction'].upper()}")
@@ -78,9 +78,9 @@ def main():
 
     summary_df = pd.DataFrame(summary_data)
     summary_df.to_csv("data/processed/forecast_summary.csv", index=False)
-    print("\n💾 Forecast summary saved to data/processed/forecast_summary.csv")
-    print("📁 Models saved to models/")
-    print("✅ Done!")
+    print("\nForecast summary saved to data/processed/forecast_summary.csv")
+    print("Models saved to models/")
+    print("Done.")
 
 
 if __name__ == "__main__":

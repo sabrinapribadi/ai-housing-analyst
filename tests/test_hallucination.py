@@ -94,7 +94,7 @@ class HallucinationDetector:
 
     def test_question(self, question: str) -> dict:
         """Test a question for hallucination."""
-        print(f"\n🔍 Testing: {question}")
+        print(f"\nTesting: {question}")
 
         response = self.agent.ask(question)
         print(f"   Response: {response[:200]}...")

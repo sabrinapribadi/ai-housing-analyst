@@ -50,7 +50,7 @@ class GeospatialClusterer:
         X = self.listings[features].dropna().values
         X_scaled = self.scaler.fit_transform(X)
 
-        logger.info(f"✅ Prepared {len(X_scaled):,} rows with features: {features}")
+        logger.info(f"Prepared {len(X_scaled):,} rows with features: {features}")
         return X_scaled
 
     def find_optimal_clusters(self, max_k: int = 10) -> Dict[str, Any]:
@@ -74,7 +74,7 @@ class GeospatialClusterer:
         diffs = np.diff(inertias)
         elbow = np.argmin(diffs[1:]) + 2
 
-        logger.info(f"📊 Optimal clusters: {elbow} (based on elbow method)")
+        logger.info(f"Optimal clusters: {elbow} (based on elbow method)")
 
         return {
             'k_values': list(range(1, max_k + 1)),
@@ -107,7 +107,7 @@ class GeospatialClusterer:
         cluster_names = self._generate_cluster_names()
         self.listings['cluster_name'] = self.listings['cluster'].map(cluster_names)
 
-        logger.info(f"✅ Assigned {len(self.listings[self.listings['cluster'].notna()]):,} listings to {n_clusters} clusters")
+        logger.info(f"Assigned {len(self.listings[self.listings['cluster'].notna()]):,} listings to {n_clusters} clusters")
 
         self._log_cluster_stats()
 
@@ -148,7 +148,7 @@ class GeospatialClusterer:
             'longitude': 'mean'
         })
 
-        logger.info("📊 Cluster Statistics:")
+        logger.info("Cluster Statistics:")
         for cluster_id, row in stats.iterrows():
             name = self.listings[self.listings['cluster'] == cluster_id]['cluster_name'].iloc[0]
             count = row[('price', 'count')]
@@ -184,7 +184,7 @@ class GeospatialClusterer:
             path = self.output_dir / 'geospatial_clusters.png'
             plt.savefig(path, dpi=150, bbox_inches='tight')
             plt.close()
-            logger.info(f"💾 Saved to {path}")
+            logger.info(f"Saved to {path}")
             return str(path)
 
         plt.show()
@@ -214,7 +214,7 @@ class GeospatialClusterer:
                 fill_opacity=0.6
             ).add_to(m)
 
-        logger.info("🗺️ Interactive map created")
+        logger.info("Interactive map created")
         return m
 
     def get_cluster_summary(self) -> pd.DataFrame:
