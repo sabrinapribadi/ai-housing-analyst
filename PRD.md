@@ -1,6 +1,6 @@
 PRODUCT REQUIREMENT DOCUMENT (PRD)
 Project: AI Housing Market Analyst – An LLM-Powered Data Agent
-Version: 5.0 (Full RAG Pipeline)
+Version: 5.1 (RAG UX Polish)
 Author: Sabrina Pribadi
 Date: June 25, 2026
 Status: Completed
@@ -147,9 +147,14 @@ Module G: RAG Review Search Agent (ReviewRAGAgent) — Ask the Reviews tab
       proportionally from 444K, embeds in batches of 100, upserts to ChromaDB.
       Supports --rebuild flag to force a full re-index.
 - G.6 UI — Ask the Reviews tab:
-      - 6 quick-question presets (complaints, cleanliness, host communication, etc.)
+      - 6 quick-question presets (complaints, cleanliness, host communication, etc.);
+        clicking a preset writes directly to session state and auto-triggers the search
+        (no need to click "Search Reviews" separately)
       - Free-text question input + optional neighbourhood dropdown filter
       - Synthesised answer with source review cards (expandable, show similarity score)
+      - Source reviews auto-translated to English (langdetect + deep-translator);
+        non-English cards display the translated text with the language tag in the
+        expander label; original text accessible in a nested expander
       - Graceful fallback message if index is not present
 
 Module D: Web Interface
@@ -358,6 +363,9 @@ Data Pipeline:
 |        |          | scoring methodology disclaimer with known-limitations note    |           |
 | 9      | 2 days   | Full RAG pipeline: ReviewRAGAgent, ChromaDB vector store,     | Completed |
 |        |          | OpenAI text-embedding-3-small (256-dim), Ask the Reviews tab  |           |
+| 10     | 0.5 days | RAG UX polish: preset buttons auto-trigger search via session | Completed |
+|        |          | state; source reviews auto-translated (langdetect +           |           |
+|        |          | deep-translator) with original in nested expander             |           |
 
 
 10. TESTING STRATEGY
