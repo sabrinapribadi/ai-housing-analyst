@@ -7,7 +7,7 @@ An end-to-end data analytics and AI platform for exploring the Tokyo Airbnb mark
 | Page | What it does |
 |------|-------------|
 | **Dashboard** | Key market metrics, annotated price histogram, neighbourhood treemap, price vs rating scatter, box plot, rule-based price predictor |
-| **AI Assistant** | Two tabs: **Chat with Agent** — natural language Q&A via LangChain + GPT-4o-mini (8 tools, inline charts); **Ask the Reviews (RAG)** — semantic search over 25,000 embedded reviews via ChromaDB + OpenAI text-embedding-3-small, answers grounded in retrieved guest review text |
+| **AI Assistant** | Two tabs: **Chat with Agent** — natural language Q&A via LangChain + GPT-4o-mini (8 tools, inline charts); **Ask the Reviews (RAG)** — semantic search over 25,000 embedded reviews via ChromaDB + OpenAI text-embedding-3-small, answers grounded in retrieved guest review text; quick-question presets auto-trigger search; source reviews auto-translated to English |
 | **Maps** | Choropleth by avg price with hover tooltips, listing density heatmap, MarkerCluster with rich popups — dark tile base with a layer guide panel |
 | **Sentiment Analysis** | TextBlob scoring on up to 100,000 reviews per filter (cached); Most Positive / Most Negative tabs filter by genuine label (> 0.1 / < −0.1); inline disclaimer explains translation artefacts and mixed-sentiment scoring |
 | **Data Explorer** | Column selector, configurable row count, smart number formatting (thousands separators, smart decimals), distribution viewer, data quality chart, neighbourhood comparison |
