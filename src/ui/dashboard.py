@@ -710,14 +710,20 @@ elif page == "AI Assistant":
                 if result["sources"]:
                     st.markdown("### Source Reviews")
                     st.caption(
-                        "Retrieved by semantic similarity — expand to read the actual review text."
+                        "Retrieved by semantic similarity. "
+                        "Non-English reviews are auto-translated — expand to see the original."
                     )
                     for src in result["sources"]:
+                        translated, lang, was_translated = _translate(src["text"])
                         label = (
                             f"{src['neighbourhood']}  ·  similarity {src['similarity']:.2f}"
+                            + (f"  ·  {lang.upper()}" if was_translated else "")
                         )
                         with st.expander(label):
-                            st.write(src["text"])
+                            st.write(translated)
+                            if was_translated:
+                                with st.expander(f"Original · {lang.upper()}"):
+                                    st.write(src["text"])
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
