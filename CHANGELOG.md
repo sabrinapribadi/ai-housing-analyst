@@ -2,6 +2,14 @@
 
 Newest first. Each entry uses STAR (Situation, Task, Action, Result) so it can be told as a story.
 
+## [6.0.0] — 2026-11-11 — P7: pre-registered retrieval and small-model study
+**Files:** docs/adr/ADR-006 to ADR-009 (new), configs/rag_eval.yaml (new), docs/references.yaml, docs/PRD.md (v7.0), docs/adr/README.md, scripts/evidence.py, src/agent/rag_agent.py
+- **Situation:** Review search had never been measured, every answer needed an API key, and the app had no cost or latency figures (R13).
+- **Task:** Decide, before any run, how to test whether better retrieval and a fine-tuned small open model can match the API model on grounded answers, cost and latency.
+- **Action:** Industry alignment (ADR-006: Airbnb's six rated categories, Japan's Minpaku duties), technology assessment with licences checked at source (ADR-007), retrieval gate G1 (ADR-008) and gates G2–G4 (ADR-009); all knobs, prices and budgets fixed in configs/rag_eval.yaml; evidence script retries OpenAlex timeouts.
+- **Result:** Design committed before any data was generated. Correction (R23): the review index comment said "balanced sample across neighbourhoods"; the code takes a simple random sample (seed 42), now stated.
+- **Talking point:** "I wrote down what would count as success, and both judges' possible biases, before training anything."
+
 ## [5.5.0] — 2026-11-11 — Results page, walkthrough, ADRs, two corrections
 **Files:** docs/index.html, docs/build.html, docs/assets/ (new); docs/adr/ (new, ADR-001 to ADR-005); docs/references.yaml, scripts/evidence.py (new); PRD.md → docs/PRD.md; tests/browser/ (new); docs/brief.yaml, README.md, .github/workflows/ci.yml
 - **Situation:** Decisions lived only in the PRD; no results page; the brief said 8 tools and listed a Prophet forecast.

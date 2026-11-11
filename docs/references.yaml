@@ -34,3 +34,88 @@
   doi: 10.1609/icwsm.v8i1.14550
   used_in: [ADR-005]
   role: rule-based sentiment (VADER), the alternative considered
+# ---- P7 pre-registration (ADR-006 industry alignment, ADR-007 technology, ADR-008 retrieval, ADR-009 small model) ----
+- key: xiang_2015_guest_experience
+  doi: 10.1016/j.ijhm.2014.10.013
+  used_in: [ADR-006]
+  role: what guest reviews reveal about experience and satisfaction (aspects hosts act on)
+- key: zervas_2021_airbnb_reputation
+  doi: 10.1007/s11002-020-09546-4
+  used_in: [ADR-006]
+  role: Airbnb star ratings are compressed near the top, so review text carries the signal
+- key: robertson_2009_bm25
+  doi: 10.1561/1500000019
+  used_in: [ADR-008]
+  role: BM25 keyword retrieval (baseline)
+- key: cormack_2009_rrf
+  doi: 10.1145/1571941.1572114
+  used_in: [ADR-008]
+  role: reciprocal rank fusion for hybrid retrieval
+- key: chen_2024_bge_m3
+  doi: 10.48550/arXiv.2402.03216
+  venue: "Findings of ACL 2024 (OpenAlex primary copy is arXiv)"
+  peer_reviewed: true
+  used_in: [ADR-007, ADR-008]
+  role: multilingual dense retrieval and reranking models
+- key: jarvelin_2002_ndcg
+  doi: 10.1145/582415.582418
+  used_in: [ADR-008]
+  role: nDCG, graded-relevance ranking metric
+- key: thomas_2024_llm_relevance
+  doi: 10.1145/3626772.3657707
+  used_in: [ADR-008]
+  role: LLM relevance labels agree with human searcher preferences
+- key: sakai_2006_bootstrap
+  doi: 10.1145/1148170.1148261
+  used_in: [ADR-008, ADR-009]
+  role: paired bootstrap tests for retrieval and system comparisons
+- key: hu_2022_lora
+  doi: 10.48550/arXiv.2106.09685
+  venue: "ICLR 2022 (OpenAlex primary copy is arXiv)"
+  peer_reviewed: true
+  used_in: [ADR-007, ADR-009]
+  role: low-rank adaptation (LoRA) fine-tuning
+- key: dettmers_2023_qlora
+  doi: 10.48550/arXiv.2305.14314
+  venue: "NeurIPS 2023 (OpenAlex primary copy is arXiv)"
+  peer_reviewed: true
+  used_in: [ADR-009]
+  role: quantised LoRA, the memory-saving alternative considered
+- key: kwon_2023_vllm
+  doi: 10.1145/3600006.3613165
+  used_in: [ADR-007, ADR-009]
+  role: vLLM and PagedAttention serving
+- key: hinton_2015_distillation
+  doi: 10.48550/arXiv.1503.02531
+  arxiv: "1503.02531"
+  used_in: [ADR-009]
+  role: knowledge distillation from a larger teacher model
+- key: qwen3_2025_report
+  doi: 10.48550/arXiv.2505.09388
+  arxiv: "2505.09388"
+  used_in: [ADR-007, ADR-009]
+  role: Qwen3 open-weight models (student and teacher)
+- key: gao_2023_alce
+  doi: 10.48550/arXiv.2305.14627
+  venue: "EMNLP 2023 (OpenAlex primary copy is arXiv)"
+  peer_reviewed: true
+  used_in: [ADR-009]
+  role: answers with citations, citation precision and recall
+- key: es_2024_ragas
+  doi: 10.48550/arXiv.2309.15217
+  venue: "EACL 2024 demos (OpenAlex primary copy is arXiv)"
+  peer_reviewed: true
+  used_in: [ADR-009]
+  role: reference-free RAG faithfulness metrics (alternative considered)
+- key: zheng_2023_llm_judge
+  doi: 10.48550/arXiv.2306.05685
+  venue: "NeurIPS 2023 Datasets and Benchmarks (OpenAlex primary copy is arXiv)"
+  peer_reviewed: true
+  used_in: [ADR-009]
+  role: LLM-as-a-judge agreement and biases
+- key: panickssery_2024_self_preference
+  doi: 10.48550/arXiv.2404.13076
+  venue: "NeurIPS 2024 (OpenAlex primary copy is arXiv)"
+  peer_reviewed: true
+  used_in: [ADR-009]
+  role: LLM judges favour their own outputs (bias to control)

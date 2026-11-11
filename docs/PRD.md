@@ -1,9 +1,9 @@
 PRODUCT REQUIREMENT DOCUMENT (PRD)
 Project: AI Housing Market Analyst – An LLM-Powered Data Agent
-Version: 6.0 (portfolio rules: ADRs with evidence, results page and walkthrough, at-a-glance brief; PRD moved to docs/)
+Version: 7.0 (P7–P11: measured retrieval quality; LoRA small open model on vLLM vs API model, pre-registered in ADR-008/009)
 Author: Sabrina Pribadi
 Date: November 11, 2026
-Status: Completed
+Status: In progress (P7 pre-registered; P8–P11 to run)
 
 
 1. EXECUTIVE SUMMARY
@@ -268,6 +268,20 @@ Module F: Hallucination Detection (tests/test_hallucination.py)
 - F.4 Test Runner: run_hallucination_tests() executes 6 standard questions, prints
       PASS/FAIL per question, and summarises total pass rate.
 
+Module G: Retrieval quality and small-model answers (P7–P11; ADR-006 to ADR-009, configs/rag_eval.yaml)
+- G.1 Question sets: templated guest-experience questions over Airbnb's six rated categories and ten
+      aspects hosts manage, optionally limited to one ward; train / validation / test splits never share
+      an (aspect, ward) pair or the held-out phrasing.
+- G.2 Retrieval evaluation: five systems (current OpenAI embeddings, BM25, bge-m3, fusion, reranked
+      fusion) on the same 25,000 reviews; graded relevance labels; nDCG@10 with a paired bootstrap; gate G1.
+- G.3 Small model: Qwen3-1.7B fine-tuned with LoRA on answers from the open teacher Qwen3-8B; served by
+      vLLM on a free Kaggle T4; compared with gpt-6-luna and gpt-4o-mini on identical contexts.
+- G.4 Answer checks: citation validity (code), supported sentences and answers-the-question (two judges
+      from different model families), abstention on out-of-scope questions; gates G2–G4.
+- G.5 Cost and latency (R13): tokens, latency and cost logged per call; p50/p95; cost per 1,000 answers;
+      an OpenAI spend ledger that stops at $5.
+- G.6 Pages: results and walkthrough updated with the outcome, pass or fail.
+
 
 6. NON-FUNCTIONAL REQUIREMENTS
 
@@ -371,6 +385,12 @@ Data Pipeline:
 | 11     | 0.5 days | Code quality: remove all emoji from scripts and logger calls; | Completed |
 |        |          | replace dashboard emoji with Material icons (:material/home:, |           |
 |        |          | :material/info:) and inline SVG icons in Folium map popups    |           |
+| P7     | 0.5 days | Pre-registration: ADR-006 industry, ADR-007 technology,       | Completed |
+|        |          | ADR-008 retrieval, ADR-009 small model; config and gates      |           |
+| P8     | 1 day    | Corpus, question sets, five retrieval systems, labels, G1     | Planned   |
+| P9     | 1 day    | Teacher answers (Qwen3-8B) and LoRA training (3 seeds), Kaggle| Planned   |
+| P10    | 1 day    | vLLM benchmark, API answers, two judges, G2–G4                | Planned   |
+| P11    | 0.5 days | Results page, walkthrough, README, LinkedIn update            | Planned   |
 
 
 10. TESTING STRATEGY

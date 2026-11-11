@@ -1,0 +1,105 @@
+# P7–P11: retrieval quality, LoRA small model vs API model (ADR-008, ADR-009). Pre-registered 2026-11-11, before any run.
+# Changing a gate, metric, split or sample size after this commit is a deviation and must be logged in the ADR.
+
+paths:
+  data_dir: ../data/ai-housing-analyst/rag_eval      # outside git (data rule); relative to the repo root
+  results_dir: data/outputs/rag_eval                 # small committed results only
+  reviews: data/processed/reviews_processed.parquet
+  listings: data/processed/listings_processed.parquet
+
+corpus:                       # the 25,000 reviews already indexed (src/agent/rag_agent.py build_index)
+  n_docs: 25000
+  min_chars: 31               # comments.strip().len() > 30
+  sample_seed: 42             # pandas .sample(random_state=42) after the same filter and merge
+  id_prefix: rev_
+
+questions:
+  seed: 20261111
+  aspects:                    # Airbnb's six rated categories plus aspects hosts must manage (ADR-006)
+    rated: [cleanliness, accuracy, check-in, communication, location, value]
+    managed: [noise, transport access, wifi and workspace, kitchen and amenities, space and layout,
+              families with children, luggage, bathroom and shower, bed comfort, air conditioning and heating]
+  ward_min_docs: 200          # a ward-scoped question needs at least this many indexed reviews in that ward
+  scoped_share: 0.4           # share of questions limited to one ward
+  phrasings_per_aspect: 3     # one phrasing per aspect is held out for test only
+  n_train: 2000               # teacher answers for LoRA (before filtering)
+  n_val: 100
+  n_test_answerable: 270
+  n_test_out_of_scope: 30     # questions the reviews cannot answer (abstention check)
+  retrieval_val: 40           # retrieval system chosen on these
+  retrieval_test: 80          # gate G1 confirmed on these (subset of test answerable)
+
+retrieval:
+  k: 10
+  pool_depth: 10              # judged pool = union of each system's top 10
+  systems:
+    R0: {kind: dense_openai, model: text-embedding-3-small, dims: 256}   # current production
+    R1: {kind: bm25, tokenizer: latin_words_plus_cjk_bigrams}
+    R2: {kind: dense_local, model: BAAI/bge-m3}
+    R3: {kind: rrf, inputs: [R0, R1, R2], k_rrf: 60}
+    R4: {kind: rerank, input: R3, candidates: 50, model: BAAI/bge-reranker-v2-m3}
+  relevance_scale: {0: unrelated, 1: mentions topic but no guest experience, 2: describes guest experience of the asked aspect, 3: direct, specific answer}
+  relevant_at: 2
+  metrics: [ndcg@10, recall@10, mrr@10]
+  gate_G1: {metric: ndcg@10, min_gain: 0.03, ci: 0.95, bootstrap: 10000}
+
+generation:
+  max_output_tokens: 256
+  temperature: 0
+  answer_rules: "English; 2-5 sentences; cite review ids like [rev_123] after each claim; say plainly when reviews do not cover the question"
+  systems:
+    A1: {provider: openai, model: gpt-6-luna, reasoning_effort: none}            # smallest current API model
+    A0: {provider: openai, model: gpt-4o-mini}                                   # current production model (reference)
+    S0: {provider: vllm, model: Qwen/Qwen3-1.7B, enable_thinking: false}         # base student
+    S1: {provider: vllm, model: Qwen/Qwen3-1.7B, lora: true, enable_thinking: false}
+  teacher: {model: Qwen/Qwen3-8B, enable_thinking: false}                        # open teacher: no API outputs used for training
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: all-linear
+  learning_rate: 2.0e-4
+  epochs: 2
+  max_seq_len: 2048
+  precision: fp16             # T4 has no bf16
+  seeds: [0, 1, 2]            # seed 0 is primary; seeds 1-2 report stability (spread > 5 points is flagged)
+  train_filter: {min_words: 25, max_words: 180, min_citations: 1, citations_must_be_in_context: true}
+
+judge:
+  primary: {provider: openai, model: gpt-6.1-terra, mode: batch_if_available}
+  cross_check: {provider: vllm, model: Qwen/Qwen3-8B}   # opposite self-preference bias (teacher of S1); gates need both judges to agree
+  blind: true                 # system names hidden, answers judged one at a time
+  human_audit: {n: 50, status: open}
+
+metrics:
+  primary: grounded_answer_rate   # per question: >=1 citation, all cited ids in context, every sentence supported, answers the question
+  secondary: [citation_validity, supported_sentence_rate, answers_question_rate, abstention_rate_out_of_scope]
+
+gates:
+  G2_finetune_helps: {compare: [S1, S0], min_gain_points: 10, ci: 0.95}
+  G3_non_inferior_to_api: {compare: [S1, A1], margin_points: -5, ci: 0.95, min_citation_validity: 0.95, min_abstention: 0.80}
+  G4_operations: {p95_s_concurrency_1: 3.0, p95_s_concurrency_8: 6.0, cost_per_1000_vs: A1, utilisation_central: 0.5, utilisation_sensitivity: [0.1, 1.0]}
+  decision: "serve S1 only if G3 and G4 pass; otherwise keep the API model and record S1 as the offline / no-key option"
+
+serving:
+  engine: vllm
+  vllm_version: "0.33.0"      # latest on PyPI 2026-11-11; LoRA on T4 (compute 7.5) unverified, fallback = merged weights
+  gpu: T4 (Kaggle Notebooks, free)
+  concurrency: [1, 8]
+  n_requests: 300
+
+# R13 prices, USD per 1M tokens, developers.openai.com/api/docs/pricing (read 2026-11-11)
+prices:
+  gpt-6-luna: {input: 0.10, cached_input: 0.01, output: 0.50}
+  gpt-4o-mini: {input: 0.15, cached_input: 0.075, output: 0.60, batch_input: 0.075, batch_output: 0.30}
+  gpt-6.1-terra: {input: 1.00, cached_input: 0.05, output: 5.00}
+  text-embedding-3-small: {input: 0.02}
+  # self-hosted T4 reference: Azure retail price API, Standard_NC4as_T4_v3 (1x T4), eastus, Linux (read 2026-11-11)
+  t4_on_demand_per_hour: 0.526
+  t4_spot_per_hour: 0.164059
+
+budgets:                      # R13
+  api_answer_cost_per_1000: 0.30
+  api_answer_p95_s: 3.0
+  project_openai_cap_usd: 5.00   # hard stop: every call is added to a ledger; the run aborts before crossing it

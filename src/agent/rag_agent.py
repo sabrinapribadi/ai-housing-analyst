@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 CHROMA_PATH  = "data/chroma"
 COLLECTION   = "tokyo_reviews"
-N_SAMPLES    = 25_000   # balanced sample across neighbourhoods
+N_SAMPLES    = 25_000   # simple random sample (seed 42) of reviews over 30 characters; not balanced by ward
 EMBED_DIMS   = 256      # text-embedding-3-small supports matryoshka reduction
 EMBED_MODEL  = "text-embedding-3-small"
 EMBED_BATCH  = 100      # safe OpenAI batch size

@@ -11,6 +11,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import sys
+import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -29,7 +30,14 @@ def fetch(ref: dict) -> dict:
         url = f"{API}/doi:{ref['doi']}"
     else:
         url = f"{API}?search={urllib.parse.quote(ref['title'])}&per-page=1"
-    w = json.load(urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "portfolio-evidence/1.0"}), timeout=30))
+    for attempt in range(4):                            # OpenAlex occasionally times out; retry with backoff
+        try:
+            w = json.load(urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "portfolio-evidence/1.0"}), timeout=60))
+            break
+        except (TimeoutError, OSError):
+            if attempt == 3:
+                raise
+            time.sleep(5 * (attempt + 1))
     if "results" in w:
         w = w["results"][0] if w["results"] else {}
     src = (w.get("primary_location") or {}).get("source") or {}
