@@ -11,7 +11,7 @@ ADR-001 to ADR-005 were written retrospectively on 2026-11-11 from the code and 
 | [ADR-005](ADR-005-analytics-methods.md) | Analytics methods | Accepted | TextBlob sentiment and K-Means areas, not validated against labels; Prophet forecast on hold (calendar has no prices). |
 | [ADR-006](ADR-006-industry-alignment.md) | Industry alignment | Accepted | Questions follow Airbnb's six rated categories plus aspects hosts manage; Japan's 180-night Minpaku rules. |
 | [ADR-007](ADR-007-technology-assessment.md) | Technology assessment | Accepted | Adopt Qwen3-1.7B (student), Qwen3-8B (teacher), LoRA, vLLM on a free Kaggle T4; hold gated-licence models and paid GPU hosts. |
-| [ADR-008](ADR-008-retrieval-evaluation.md) | Retrieval evaluation | Proposed (pre-registered) | Five retrieval systems; gate G1: ≥ 0.03 nDCG@10 over today's search. |
+| [ADR-008](ADR-008-retrieval-evaluation.md) | Retrieval evaluation | Accepted (G1 passed) | Reranked fusion lifts nDCG@10 from 0.459 to 0.545 (+0.087, interval +0.021 to +0.153); app keeps today's search until a CPU reranker is measured. |
 | [ADR-009](ADR-009-small-model-vs-api.md) | Small model vs API | Proposed (pre-registered) | LoRA Qwen3-1.7B vs gpt-6-luna; gates G2–G4 on grounding, cost and p95 latency. |
 
 ## Decision Dependencies

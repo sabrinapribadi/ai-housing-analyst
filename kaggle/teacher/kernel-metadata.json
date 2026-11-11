@@ -1,0 +1,14 @@
+{
+  "id": "sabrinapribadi/aha-teacher",
+  "title": "aha-teacher",
+  "code_file": "teacher.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": ["sabrinapribadi/aha-rag-eval"],
+  "competition_sources": [],
+  "kernel_sources": []
+}

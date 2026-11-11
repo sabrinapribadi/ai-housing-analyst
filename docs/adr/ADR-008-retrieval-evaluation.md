@@ -1,6 +1,6 @@
 # ADR-008: Retrieval Evaluation — Is the Current Review Search Good Enough?
 
-**Status:** Proposed — pre-registered 2026-11-11 before any run; results appended below
+**Status:** Accepted — pre-registered 2026-11-11 before any run; **G1 passed** (results below)
 **Date:** 2026-11-11
 **Deciders:** Sabrina Pribadi
 
@@ -60,9 +60,29 @@
 
 1. **Tokyo-wide question share (2026-11-11, before any retrieval, answer or label existed).** The registered `scoped_share: 0.4` (60% Tokyo-wide) cannot be met: each facet has one Tokyo-wide pair but 22 ward pairs, so unique Tokyo-wide questions run out. Facets were widened to 64 (4 per aspect; aspects unchanged) and Tokyo-wide questions are drawn as far as the pool allows. Actual shares: train 5.6%, validation 12%, test 2.3% Tokyo-wide; the rest name one ward. Counts (2,000 / 100 / 270 + 30) are unchanged.
 
-## Empirical Results
+2. **App adoption deferred (2026-11-11, after G1).** The registered next action on a pass was "adopt the winner in the app". R4 reranks 50 reviews per question with a 0.6B cross-encoder: 0.69 s per question on a T4 GPU (1,646 s for 2,400 questions), and the free app host has no GPU (R20). R4 is adopted for ADR-009's contexts; the live app keeps R0 until a lighter reranker is measured on CPU.
 
-_Appended after the run._
+## Empirical Results (2026-11-11)
+
+- **Labels:** 3,248 pooled (question, review) pairs, mean 27 per question; grades 0 / 1 / 2 / 3 = 1,969 / 171 / 372 / 736; 34% relevant (grade ≥ 2); 4 of 120 questions had no relevant review in the pool. Judge gpt-6.1-terra, blind; cost $0.50. Human audit of 50 labels: **open**.
+- **Choice on the 40 selection queries (nDCG@10):** R0 0.445, R1 0.214, R2 0.188, R3 0.341, **R4 0.471** → R4 chosen.
+- **Confirmation on the 80 other queries:**
+
+| System | nDCG@10 | Recall@10 | MRR@10 | Gain vs R0 (95% interval) |
+|---|---|---|---|---|
+| R0 current (OpenAI 256-d) | 0.459 | 0.435 | 0.591 | — |
+| R1 BM25 | 0.389 | 0.364 | 0.565 | −0.070 (−0.146 to +0.013) |
+| R2 bge-m3 dense | 0.300 | 0.290 | 0.431 | −0.159 (−0.218 to −0.099) |
+| R3 fusion R0+R1+R2 | 0.414 | 0.396 | 0.569 | −0.044 (−0.097 to +0.015) |
+| **R4 fusion + reranker** | **0.545** | **0.521** | **0.669** | **+0.087 (+0.021 to +0.153)** |
+
+- **G1: passed** (+0.087 ≥ 0.03; interval above 0). Decision: R4 for ADR-009 contexts.
+- **What the numbers mean:**
+  - **nDCG@10:** how close the top 10 is to the best possible order, weighting strongly relevant reviews at the top; 1 is perfect.
+  - **Recall@10:** of the reviews that answer the question, the share found in the top 10. R4 finds about 52 in 100, R0 about 44. A host reading 10 reviews sees roughly one more useful review per question.
+  - **So what:** retrieval was a real bottleneck; the gain comes from reading question and review together (the reranker), not from a different embedding model or from fusion alone.
+- **Surprises:** bge-m3 alone is the weakest system, and fusing it in lowers R0; the reranker recovers and passes R0. Ward names dominate short questions, which may hurt dense models; not tested further.
+- **Files:** `data/outputs/rag_eval/retrieval_results.json`, `data/outputs/rag_eval/qrels.csv`.
 
 ## Related Decisions
 

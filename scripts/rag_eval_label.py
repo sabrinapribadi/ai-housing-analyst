@@ -92,6 +92,9 @@ def main() -> None:
                 print("failed:", res)
 
     rows = []
+    if not raw_path.exists() or not raw_path.read_text().strip():
+        print("no labels written")
+        return
     for line in raw_path.read_text().splitlines():
         r = json.loads(line)
         rows += [{"qid": r["qid"], "doc_id": k, "grade": v} for k, v in r["grades"].items()]

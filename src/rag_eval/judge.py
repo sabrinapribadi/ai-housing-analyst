@@ -23,7 +23,7 @@ def relevance_messages(question: str, docs: list[tuple[str, str]], seed: int) ->
     random.Random(seed).shuffle(order)
     keys = {f"d{i + 1}": doc_id for i, (doc_id, _) in enumerate(order)}
     body = "\n\n".join(f"[d{i + 1}] {text[:1500]}" for i, (_, text) in enumerate(order))
-    return f"Question: {question}\n\nReviews:\n{body}", keys
+    return f"Question: {question}\n\nReviews:\n{body}\n\nReturn the grades as JSON.", keys
 
 
 def parse_grades(output_text: str, keys: dict[str, str]) -> dict[str, int]:
