@@ -28,3 +28,15 @@ def test_sizes_and_no_leak(tmp_path):
 def test_deterministic(tmp_path):
     cfg = _cfg(tmp_path)
     assert questions.build(cfg).equals(questions.build(cfg))
+
+
+def test_answer_code_checks():
+    from src.rag_eval.answers import ABSTAIN, code_checks
+    ok = code_checks("Guests found it quiet [rev_1]. Some heard trains [rev_2][rev_1].", ["rev_1", "rev_2"])
+    assert ok["citations_valid"] and ok["n_citations"] == 3 and not ok["abstained"]
+    bad = code_checks("Quiet [rev_9].", ["rev_1"])
+    assert not bad["citations_valid"] and bad["invalid_ids"] == ["rev_9"]
+    none = code_checks("Quiet and clean.", ["rev_1"])
+    assert not none["citations_valid"]
+    ab = code_checks(ABSTAIN, ["rev_1"])
+    assert ab["abstained"] and not ab["citations_valid"]

@@ -1,5 +1,5 @@
 """P9 feasibility (ADR-007): vLLM 0.33 + Qwen3-1.7B + LoRA on a Kaggle T4; Qwen3.5-2B load trial. Writes feasibility.json."""
-import json, os, subprocess, sys, time, textwrap
+import json, subprocess, sys, time, textwrap
 
 OUT = "/kaggle/working/feasibility.json"
 res = {"started": time.strftime("%Y-%m-%d %H:%M:%S")}
@@ -9,9 +9,9 @@ def sh(cmd):
 
 res["nvidia_smi"] = sh("nvidia-smi --query-gpu=name,memory.total,compute_cap,driver_version --format=csv,noheader")
 t0 = time.time()
-res["pip"] = sh(f"{sys.executable} -m pip install -q vllm==0.33.0 peft 2>&1 | tail -5")
+res["pip"] = sh(f"{sys.executable} -m pip install -q vllm==0.33.0 peft 'torchao>0.16' 2>&1 | tail -5")
 res["pip_seconds"] = round(time.time() - t0)
-res["versions"] = sh(f"{sys.executable} -c \"import vllm, torch, transformers, peft; print(vllm.__version__, torch.__version__, transformers.__version__, peft.__version__, torch.version.cuda)\"")
+res["versions"] = sh(f"{sys.executable} -c \"import vllm, torch, transformers, peft, torchao; print(vllm.__version__, torch.__version__, transformers.__version__, peft.__version__, torchao.__version__, torch.version.cuda, torch.cuda.device_count())\"")
 json.dump(res, open(OUT, "w"), indent=1)
 
 # 1) dummy LoRA adapter (random B so the LoRA path really changes outputs)
@@ -22,10 +22,14 @@ make_adapter = textwrap.dedent('''
     m = AutoModelForCausalLM.from_pretrained("Qwen/Qwen3-1.7B", torch_dtype=torch.float16)
     m = get_peft_model(m, LoraConfig(r=16, lora_alpha=32, target_modules="all-linear", init_lora_weights=False))
     m.save_pretrained("/kaggle/working/dummy_lora")
+    m.merge_and_unload().save_pretrained("/kaggle/working/merged")
+    from transformers import AutoTokenizer
+    AutoTokenizer.from_pretrained("Qwen/Qwen3-1.7B").save_pretrained("/kaggle/working/merged")
     print("adapter ok")
 ''')
 open("/kaggle/working/make_adapter.py", "w").write(make_adapter)
 res["adapter"] = sh(f"{sys.executable} /kaggle/working/make_adapter.py 2>&1 | tail -3")
+res["adapter_files"] = sh("ls /kaggle/working/dummy_lora /kaggle/working/merged 2>&1 | head -20")
 
 # 2) vLLM with and without LoRA, each in its own process so GPU memory is released
 run_vllm = textwrap.dedent('''
@@ -57,10 +61,15 @@ run_vllm = textwrap.dedent('''
 ''')
 open("/kaggle/working/run_vllm.py", "w").write(run_vllm)
 res["runs"] = []
-for model, lora in (("Qwen/Qwen3-1.7B", "0"), ("Qwen/Qwen3-1.7B", "1"), ("Qwen/Qwen3.5-2B", "0")):
+for model, lora in (("Qwen/Qwen3-1.7B", "1"), ("/kaggle/working/merged", "0")):
     log = sh(f"{sys.executable} /kaggle/working/run_vllm.py {model} {lora}")
     line = [l for l in log.splitlines() if l.startswith("RESULT ")]
-    res["runs"].append(json.loads(line[-1][7:]) if line else {"model": model, "lora": lora == "1", "ok": False, "log_tail": log[-2500:]})
+    r = json.loads(line[-1][7:]) if line else {"model": model, "lora": lora == "1", "ok": False}
+    if not r.get("ok"):
+        errs = [l for l in log.splitlines() if "Error" in l or "error" in l or "Traceback" in l]
+        r["log_errors"] = errs[-25:]
+        r["log_tail"] = log[-3000:]
+    res["runs"].append(r)
     json.dump(res, open(OUT, "w"), indent=1)
 
 res["finished"] = time.strftime("%Y-%m-%d %H:%M:%S")

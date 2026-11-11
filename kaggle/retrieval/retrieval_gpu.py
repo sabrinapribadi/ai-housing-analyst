@@ -6,7 +6,11 @@ import numpy as np, pandas as pd, torch
 from sentence_transformers import SentenceTransformer
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-IN, OUT = "/kaggle/input/aha-rag-eval", "/kaggle/working"
+import glob, os
+OUT = "/kaggle/working"
+_hits = glob.glob("/kaggle/input/**/corpus.parquet", recursive=True)   # mount path differs between Kaggle versions
+assert _hits, "corpus.parquet not found under /kaggle/input: " + str(glob.glob("/kaggle/input/**", recursive=True)[:20])
+IN = os.path.dirname(_hits[0])
 corpus = pd.read_parquet(f"{IN}/corpus.parquet"); qs = pd.read_parquet(f"{IN}/questions.parquet")
 timing = {"gpu": torch.cuda.get_device_name(0)}
 
