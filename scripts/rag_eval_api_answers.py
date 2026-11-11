@@ -45,7 +45,7 @@ def main() -> None:
     est = ledger.cost(model, 1600 * len(todo), 200 * len(todo))
     print(f"{system} ({model}): {len(todo)} to answer, estimated ${est:.3f}; spent ${ledger.spent():.4f}")
     ledger.check(est * 1.5)
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"], timeout=60, max_retries=2)
     kw = {"reasoning": {"effort": spec["reasoning_effort"]}} if "reasoning_effort" in spec else {"temperature": cfg["generation"]["temperature"]}
 
     rows = []

@@ -63,7 +63,7 @@ def main() -> None:
     if args.dry_run or not jobs:
         return
     ledger.check(est * 1.3)
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"], timeout=60, max_retries=2)
 
     def work(job):
         qid, chunk, ids = job
