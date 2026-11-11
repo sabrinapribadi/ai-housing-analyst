@@ -1,6 +1,26 @@
 # Airbnb Tokyo Analytics Platform
 
-An end-to-end data analytics and AI platform for exploring the Tokyo Airbnb market. Ask questions in plain English, get interactive charts and maps, discover hidden patterns automatically, and merge in your own external datasets — no SQL or Python required.
+<!-- brief:start -->
+
+## At a glance
+
+1. **What:** An analytics and AI app for the Tokyo Airbnb market: dashboards, maps, a chat agent and search over guest reviews.
+2. **Why:** Hosts and analysts want prices, gaps and guest sentiment by neighbourhood without writing queries.
+3. **Who:** Users: hosts, investors and market analysts.
+   - Data: Inside Airbnb Tokyo, 27,945 listings and 444,182 reviews.
+4. **Where:** A Streamlit app that runs locally; no public deployment yet.
+5. **When it fails:** A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run.
+   - No live A/B test: there are no users. Clustering has unit tests; CI runs them on every push.
+6. **How:** LangChain agent with 8 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); K-Means areas; Prophet forecast.
+
+**Skills applied** (each linked to the file or decision that shows it):
+
+- **GenAI and agents:** tool-using LangChain agent, retrieval over reviews, AI-guided data merge — [agent.py](src/agent/agent.py), [rag_agent.py](src/agent/rag_agent.py), [discovery_agent.py](src/agent/discovery_agent.py)
+- **Analytics and ML:** EDA, K-Means geospatial clusters, Prophet forecast — [clustering.py](src/analytics/clustering.py), [forecast.py](src/models/forecast.py)
+- **Evaluation:** hallucination test suite with a written checklist — [test_hallucination.py](tests/test_hallucination.py), [checklist](tests/hallucination_checklist.md)
+- **CI:** GitHub Actions lint and unit tests on every push — [ci.yml](.github/workflows/ci.yml)
+
+<!-- brief:end -->
 
 ## Features
 

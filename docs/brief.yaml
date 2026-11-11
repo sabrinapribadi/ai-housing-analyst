@@ -1,0 +1,36 @@
+# At-a-glance brief (rule R22). Edit here only; `python scripts/brief.py` writes it into README.md and the pages.
+repo_url: https://github.com/sabrinapribadi/ai-housing-analyst
+brief:
+  - w: What
+    lines:
+      - "An analytics and AI app for the Tokyo Airbnb market: dashboards, maps, a chat agent and search over guest reviews."
+  - w: Why
+    lines:
+      - Hosts and analysts want prices, gaps and guest sentiment by neighbourhood without writing queries.
+  - w: Who
+    lines:
+      - "Users: hosts, investors and market analysts."
+      - "Data: Inside Airbnb Tokyo, 27,945 listings and 444,182 reviews."
+  - w: Where
+    lines:
+      - A Streamlit app that runs locally; no public deployment yet.
+  - w: When it fails
+    lines:
+      - "A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run."
+      - "No live A/B test: there are no users. Clustering has unit tests; CI runs them on every push."
+  - w: How
+    lines:
+      - LangChain agent with 8 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); K-Means areas; Prophet forecast.
+skills:
+  - group: GenAI and agents
+    what: tool-using LangChain agent, retrieval over reviews, AI-guided data merge
+    proof: [["agent.py", "src/agent/agent.py"], ["rag_agent.py", "src/agent/rag_agent.py"], ["discovery_agent.py", "src/agent/discovery_agent.py"]]
+  - group: Analytics and ML
+    what: EDA, K-Means geospatial clusters, Prophet forecast
+    proof: [["clustering.py", "src/analytics/clustering.py"], ["forecast.py", "src/models/forecast.py"]]
+  - group: Evaluation
+    what: hallucination test suite with a written checklist
+    proof: [["test_hallucination.py", "tests/test_hallucination.py"], ["checklist", "tests/hallucination_checklist.md"]]
+  - group: CI
+    what: GitHub Actions lint and unit tests on every push
+    proof: [["ci.yml", ".github/workflows/ci.yml"]]
