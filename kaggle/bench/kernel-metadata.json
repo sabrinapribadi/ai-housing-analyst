@@ -1,0 +1,14 @@
+{
+  "id": "sabrinapribadi/aha-bench",
+  "title": "aha-bench",
+  "code_file": "bench.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": ["sabrinapribadi/aha-rag-eval"],
+  "competition_sources": [],
+  "kernel_sources": ["sabrinapribadi/aha-lora"]
+}
