@@ -1,0 +1,36 @@
+# Every paper or dataset cited in an ADR (rule R2). `python scripts/evidence.py` fetches venue, type and citations
+# from OpenAlex and writes data/outputs/references_evidence.json plus a table per ADR. Vendor docs are listed in the ADRs only.
+- key: inside_airbnb_tokyo
+  title: "Inside Airbnb: Tokyo (listings, reviews, calendar), scraped 29–30 September 2025"
+  venue: "Inside Airbnb (public data, CC BY 4.0)"
+  kind: dataset
+  used_in: [ADR-001]
+  role: listings, reviews and calendar
+- key: yao_2023_react
+  doi: 10.48550/arXiv.2210.03629
+  venue: "ICLR 2023 (OpenAlex primary copy is arXiv)"
+  peer_reviewed: true
+  used_in: [ADR-002]
+  role: reasoning-and-acting agents that call tools
+- key: lewis_2020_rag
+  doi: 10.48550/arXiv.2005.11401
+  venue: "NeurIPS 2020 (OpenAlex primary copy is arXiv)"
+  peer_reviewed: true
+  used_in: [ADR-003]
+  role: retrieval-augmented generation
+- key: ji_2023_hallucination
+  doi: 10.1145/3571730
+  used_in: [ADR-004]
+  role: hallucination in language generation (survey)
+- key: lloyd_1982
+  doi: 10.1109/TIT.1982.1056489
+  used_in: [ADR-005]
+  role: K-Means clustering
+- key: taylor_letham_2018
+  doi: 10.1080/00031305.2017.1380080
+  used_in: [ADR-005]
+  role: Prophet forecasting
+- key: hutto_gilbert_2014
+  doi: 10.1609/icwsm.v8i1.14550
+  used_in: [ADR-005]
+  role: rule-based sentiment (VADER), the alternative considered

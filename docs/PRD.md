@@ -1,8 +1,8 @@
 PRODUCT REQUIREMENT DOCUMENT (PRD)
 Project: AI Housing Market Analyst – An LLM-Powered Data Agent
-Version: 5.2 (Code Quality — De-emoji Pass)
+Version: 6.0 (portfolio rules: ADRs with evidence, results page and walkthrough, at-a-glance brief; PRD moved to docs/)
 Author: Sabrina Pribadi
-Date: June 25, 2026
+Date: November 11, 2026
 Status: Completed
 
 
@@ -117,7 +117,7 @@ Module B: Analytics & Modelling
 
 Module C: Q&A Agent (AirbnbAgent) — Chat with Agent tab
 - C.1 Agent Framework: LangChain with LangGraph (v1.3 compatible).
-- C.2 Tools Provided: 8 tools —
+- C.2 Tools Provided: 7 tools —
       · get_summary_stats: total listings, avg/median price, top-5 expensive/cheapest districts
       · get_review_stats: mean + median for all 7 review score dimensions (overall, accuracy,
         cleanliness, check-in, communication, location, value) and rating distribution bands
@@ -328,7 +328,7 @@ Data Pipeline:
           |                          |                          |
 +---------+---------+    +-----------+-----------+    +--------+--------+
 | AirbnbAgent       |    | DataDiscoveryAgent    |    | HallucinationD. |
-| (Q&A, 8 tools)    |    | (Discovery+Integrate) |    | (Test suite)    |
+| (Q&A, 7 tools)    |    | (Discovery+Integrate) |    | (Test suite)    |
 | LangChain/LangGrph|    | GPT-4o-mini + difflib |    | Ground truth vs |
 +---+---+---+---+---+    +-----------+-----------+    | Parquet values  |
     |   |   |   |                    |                 +-----------------+
@@ -452,9 +452,9 @@ Additional criteria met:
 - Tech Stack: Streamlit, LangChain, LangGraph, OpenAI GPT-4o-mini,
   text-embedding-3-small, ChromaDB, scikit-learn, GeoPandas, Folium, Plotly,
   langdetect, deep-translator, TextBlob, difflib
-- Agents: AirbnbAgent (Q&A, 8 tools), ReviewRAGAgent (RAG search),
+- Agents: AirbnbAgent (Q&A, 7 tools), ReviewRAGAgent (RAG search),
   DataDiscoveryAgent (discovery + integration)
 - Pages: 6 dashboard pages
-- Agent Tools: 8 Q&A tools, 5 discovery methods, 3 integration methods
+- Agent Tools: 7 Q&A tools, 5 discovery methods, 3 integration methods
 - RAG Index: 25,000 reviews, text-embedding-3-small 256-dim, ChromaDB cosine similarity
 - Test Suite: 6 hallucination tests against Parquet ground truth

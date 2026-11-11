@@ -2,6 +2,14 @@
 
 Newest first. Each entry uses STAR (Situation, Task, Action, Result) so it can be told as a story.
 
+## [5.5.0] — 2026-11-11 — Results page, walkthrough, ADRs, two corrections
+**Files:** docs/index.html, docs/build.html, docs/assets/ (new); docs/adr/ (new, ADR-001 to ADR-005); docs/references.yaml, scripts/evidence.py (new); PRD.md → docs/PRD.md; tests/browser/ (new); docs/brief.yaml, README.md, .github/workflows/ci.yml
+- **Situation:** Decisions lived only in the PRD; no results page; the brief said 8 tools and listed a Prophet forecast.
+- **Task:** Results page and walkthrough (R12, R14), retrospective ADRs with evidence (R2, R4), browser tests and Pages gated on CI (R19), and every stated number checked against the data.
+- **Action:** Pages generated from the listings file (DuckDB); five ADRs with OpenAlex evidence tables; browser checks for hovers, sliders, themes and phone width; Pages deploy only after tests pass. Profiled every column a claim relies on.
+- **Result:** 7 tools (not 8). The calendar has no prices (0 of 10,199,937 rows), so the Prophet forecast is on hold and removed from the brief. K-Means uses a fixed k = 5; the elbow search is not called. Hidden gems are 6,593, not about 6,000. 81 results-page and 189 walkthrough checks pass.
+- **Talking point:** "Writing the records found a feature the data could not support, so I took the claim down."
+
 ## [5.4.0] — 2026-11-11 — At-a-glance brief (R22), free-tier notes
 **Files:** docs/brief.yaml (new), scripts/brief.py (new), README.md, .github/workflows/ci.yml, CHANGELOG.md
 - **Situation:** A reader had to scroll and piece together what the Tokyo Airbnb app is, why, who, where, when it fails and how.

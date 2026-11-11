@@ -8,17 +8,18 @@
 2. **Why:** Hosts and analysts want prices, gaps and guest sentiment by neighbourhood without writing queries.
 3. **Who:** Users: hosts, investors and market analysts.
    - Data: Inside Airbnb Tokyo, 27,945 listings and 444,182 reviews.
-4. **Where:** A Streamlit app that runs locally; no public deployment yet.
+4. **Where:** [Results page](https://sabrinapribadi.github.io/ai-housing-analyst/) and [technical walkthrough](https://sabrinapribadi.github.io/ai-housing-analyst/build.html) on GitHub Pages.
+   - The Streamlit app runs locally with an OpenAI key.
 5. **When it fails:** A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run.
    - No live A/B test: there are no users. Clustering has unit tests; CI runs them on every push.
-6. **How:** LangChain agent with 8 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); K-Means areas; Prophet forecast.
+6. **How:** LangChain agent with 7 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); TextBlob sentiment; K-Means areas.
 
 **Skills applied** (each linked to the file or decision that shows it):
 
 - **GenAI and agents:** tool-using LangChain agent, retrieval over reviews, AI-guided data merge — [agent.py](src/agent/agent.py), [rag_agent.py](src/agent/rag_agent.py), [discovery_agent.py](src/agent/discovery_agent.py)
-- **Analytics and ML:** EDA, K-Means geospatial clusters, Prophet forecast — [clustering.py](src/analytics/clustering.py), [forecast.py](src/models/forecast.py)
+- **Analytics and ML:** EDA, K-Means geospatial clusters, review sentiment — [eda.py](src/analytics/eda.py), [clustering.py](src/analytics/clustering.py)
 - **Evaluation:** hallucination test suite with a written checklist — [test_hallucination.py](tests/test_hallucination.py), [checklist](tests/hallucination_checklist.md)
-- **CI:** GitHub Actions lint and unit tests on every push — [ci.yml](.github/workflows/ci.yml)
+- **CI:** GitHub Actions lint, unit and browser tests; Pages deploy only after they pass — [ci.yml](.github/workflows/ci.yml)
 
 <!-- brief:end -->
 
@@ -27,7 +28,7 @@
 | Page | What it does |
 |------|-------------|
 | **Dashboard** | Key market metrics, annotated price histogram, neighbourhood treemap, price vs rating scatter, box plot, rule-based price predictor |
-| **AI Assistant** | Two tabs: **Chat with Agent** — natural language Q&A via LangChain + GPT-4o-mini (8 tools, inline charts); **Ask the Reviews (RAG)** — semantic search over 25,000 embedded reviews via ChromaDB + OpenAI text-embedding-3-small, answers grounded in retrieved guest review text; quick-question presets auto-trigger search; source reviews auto-translated to English |
+| **AI Assistant** | Two tabs: **Chat with Agent** — natural language Q&A via LangChain + GPT-4o-mini (7 tools, inline charts); **Ask the Reviews (RAG)** — semantic search over 25,000 embedded reviews via ChromaDB + OpenAI text-embedding-3-small, answers grounded in retrieved guest review text; quick-question presets auto-trigger search; source reviews auto-translated to English |
 | **Maps** | Choropleth by avg price with hover tooltips, listing density heatmap, MarkerCluster with rich popups — dark tile base with a layer guide panel |
 | **Sentiment Analysis** | TextBlob scoring on up to 100,000 reviews per filter (cached); Most Positive / Most Negative tabs filter by genuine label (> 0.1 / < −0.1); inline disclaimer explains translation artefacts and mixed-sentiment scoring |
 | **Data Explorer** | Column selector, configurable row count, smart number formatting (thousands separators, smart decimals), distribution viewer, data quality chart, neighbourhood comparison |
@@ -41,30 +42,41 @@ ai-housing-analyst/
 │   └── config.toml              # Dark theme + Airbnb coral accent
 ├── src/
 │   ├── agent/
-│   │   ├── agent.py             # LangChain Q&A agent (8 tools)
+│   │   ├── agent.py             # LangChain Q&A agent (7 tools)
 │   │   ├── rag_agent.py         # ReviewRAGAgent: ChromaDB + OpenAI embeddings RAG
 │   │   └── discovery_agent.py   # DataDiscoveryAgent: auto-discovery + data integration
 │   ├── analytics/
 │   │   ├── eda.py               # EDA plot functions (Matplotlib)
 │   │   └── clustering.py        # K-Means geospatial clustering
 │   ├── data/                    # Loader, cleaner, feature engineer
-│   ├── models/                  # Forecast model (Prophet)
+│   ├── models/                  # Forecast model (Prophet; on hold, calendar has no prices)
 │   └── ui/
 │       └── dashboard.py         # Streamlit 6-page app
 ├── scripts/
 │   ├── save_processed_data.py   # Run once to build Parquet files
 │   ├── build_review_index.py    # Run once to build ChromaDB RAG index (~$0.05)
-│   └── train_forecast.py        # Train and serialise the forecast model
+│   └── train_forecast.py        # Forecast training (needs a calendar with prices; ADR-005)
 ├── data/
 │   └── chroma/                  # Pre-built ChromaDB vector store (85 MB, committed)
+├── docs/
+│   ├── index.html, build.html   # Results page and technical walkthrough (GitHub Pages)
+│   ├── PRD.md                   # Product requirements
+│   └── adr/                     # Architecture decision records (ADR-001 to ADR-005)
 ├── tests/
 │   ├── test_hallucination.py    # Automated hallucination detection suite
-│   └── hallucination_checklist.md
+│   ├── hallucination_checklist.md
+│   └── browser/                 # Page checks run in CI
 ├── data/                        # Raw CSV / GeoJSON (not committed — see .gitignore)
 ├── outputs/                     # Agent-generated plots (auto-created at runtime)
 ├── notebooks/
 └── pyproject.toml
 ```
+
+## Records
+
+- [Product requirements](docs/PRD.md)
+- [Decision records and dependency tree](docs/adr/README.md)
+- [Change log (STAR)](CHANGELOG.md)
 
 ## Setup
 
@@ -188,7 +200,7 @@ textColor                = "#F0F0F0"
 | Icons           | Streamlit Material icons (:material/\*), inline SVG for Folium popups     |
 | AI / Agent      | LangChain, LangGraph, OpenAI GPT-4o-mini                                  |
 | RAG             | ChromaDB (vector store), OpenAI text-embedding-3-small (256-dim)          |
-| ML              | scikit-learn (K-Means), Prophet                                           |
+| ML              | scikit-learn (K-Means); Prophet code on hold (ADR-005)                    |
 | Data            | Pandas, NumPy, GeoPandas                                                  |
 | NLP             | TextBlob (sentiment), langdetect, deep-translator                         |
 | Schema matching | difflib (fuzzy fallback for column mapping without LLM)                   |
@@ -213,4 +225,4 @@ textColor                = "#F0F0F0"
 - **Cheapest district:** Higashiyamato Shi (¥5,136 avg)
 - **Top room type:** Entire home/apt (23,759 listings)
 - **Market segments:** 5 K-Means clusters (Luxury Central, Premium Central, etc.)
-- **Hidden gems:** ~6,000 listings rated above median but priced below median
+- **Hidden gems:** 6,593 listings rated at or above the median but priced below the median (rated, priced listings)

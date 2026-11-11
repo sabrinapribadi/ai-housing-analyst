@@ -1,0 +1,242 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tokyo Airbnb Market Analyst</title>
+<!-- share preview (portfolio rule R18) -->
+<meta name="description" content="Tokyo Airbnb prices by ward and room type from 27,945 public listings, with an AI assistant whose numbers come from code.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sabrinapribadi.github.io/ai-housing-analyst/">
+<meta property="og:title" content="Tokyo Airbnb Market Analyst">
+<meta property="og:description" content="Tokyo Airbnb prices by ward and room type from 27,945 public listings, with an AI assistant whose numbers come from code.">
+<meta property="og:image" content="https://sabrinapribadi.github.io/ai-housing-analyst/assets/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+<meta property="og:image:alt" content="Top of the Tokyo Airbnb Market Analyst page">
+<meta name="twitter:card" content="summary_large_image">
+<!-- /share preview -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+/* Results page (portfolio rules R3, R9, R10, R12). Generated from the shared results template. */
+:root {
+  --bg: #f5f4f0; --surface: #fffefb; --fg: #1d1f21; --muted: #5f6368; --line: #e2e0d8; --tint: #eceae3;
+  --accent: #b8434a; --accent-soft: #f7e0e1;
+  --ok: #2c7a4b; --bad: #b23a2a; --c1: #b8434a; --c2: #b06a1f; --c3: #6b5ca5; --c4: #8a8f96;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-head: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15171a; --surface: #1d2024; --fg: #e8e6e1; --muted: #a2a6ab; --line: #2f3338; --tint: #24282c;
+  --accent: #f2939a; --accent-soft: #3b1d20; --ok: #6fc28f; --bad: #e88a7a; --c1: #f2939a; --c2: #e0a35f; --c3: #a99be0; --c4: #8d939a;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #15171a; --surface: #1d2024; --fg: #e8e6e1; --muted: #a2a6ab; --line: #2f3338; --tint: #24282c;
+  --accent: #f2939a; --accent-soft: #3b1d20; --ok: #6fc28f; --bad: #e88a7a; --c1: #f2939a; --c2: #e0a35f; --c3: #a99be0; --c4: #8d939a;
+  color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 var(--font-body); }
+[hidden] { display: none !important; }
+a { color: var(--accent); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 48px; }
+.eyebrow { font: 600 11.5px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font: 700 clamp(28px, 4.2vw, 40px)/1.15 var(--font-head); margin: 6px 0 4px; text-wrap: balance; }
+h2 { font: 700 24px/1.2 var(--font-head); margin: 0; text-wrap: balance; }
+h3 { font-size: 16px; margin: 0; }
+.toc { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 18px; font-size: 14px; }
+.toc a { text-decoration: none; }
+.toc .n { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 5px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font: 600 11px var(--font-mono); }
+section.block { margin-top: 40px; display: grid; gap: 14px; }
+.sec-head { display: flex; align-items: baseline; gap: 10px; }
+.sec-head .n { font: 600 13px var(--font-mono); color: var(--accent); }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.cols > * { min-width: 0; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; }
+ul.points { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13.5px; }
+.flow span { background: var(--tint); border-radius: 6px; padding: 4px 8px; }
+.flow span.now { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.flow i { color: var(--muted); font-style: normal; }
+.scroll { overflow-x: auto; max-width: 100%; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 11.5px var(--font-mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.chosen { color: var(--accent); font-weight: 600; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; }
+.tile b { font: 600 26px/1.1 var(--font-mono); color: var(--accent); }
+.tile span { font-size: 13.5px; color: var(--muted); }
+.chart { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; }
+.chart .sub { font-size: 13px; color: var(--muted); margin: 0; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart svg text { fill: var(--fg); font: 12px var(--font-body); }
+.chart svg text.dim { fill: var(--muted); }
+.chart svg .axis { stroke: var(--line); }
+.chart svg [data-tip] { cursor: default; outline: none; }
+.chart svg [data-tip]:focus-visible { stroke: var(--fg); stroke-width: 2; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 3px; margin-right: 5px; vertical-align: middle; border-radius: 2px; }
+.slider { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 13.5px; }
+.slider input { flex: 1 1 220px; accent-color: var(--accent); }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+details > summary { cursor: pointer; font-weight: 600; }
+details > .body { display: grid; gap: 10px; margin-top: 10px; font-size: 14px; }
+.faq { display: grid; gap: 8px; }
+dl.gloss { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0; font-size: 14px; }
+dl.gloss dt { font-weight: 600; } dl.gloss dd { margin: 0; }
+.tip { position: fixed; z-index: 10; max-width: 300px; background: var(--fg); color: var(--bg); font-size: 12.5px; line-height: 1.45; padding: 8px 10px; border-radius: 8px; pointer-events: none; box-shadow: 0 4px 14px rgba(0,0,0,.18); }
+.tip b { display: block; margin-bottom: 2px; }
+footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); display: grid; gap: 6px; }
+@media (max-width: 560px) { .wrap { padding-inline: 16px; } dl.gloss { grid-template-columns: 1fr; } }
+/* brief:css:start (rule R22, written by scripts/brief.py) */
+.brief { display: grid; gap: 12px; padding-block: 18px 4px; text-align: left; }
+.brief a { color: var(--accent); }
+.brief-list { list-style: none; margin: 0; padding: 0 !important; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+.brief-list li { display: grid; align-content: start; gap: 4px; padding: 12px 14px; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line, var(--border)); border-radius: 8px; }
+.brief-w { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.brief-main { font-size: 14.5px; line-height: 1.45; color: var(--fg, var(--text)); }
+.brief-sub { font-size: 13px; line-height: 1.45; color: var(--muted); }
+.brief-skills summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.brief-skills ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13.5px; line-height: 1.45; }
+.brief-proof { font-size: 12px; margin-left: 4px; white-space: nowrap; }
+/* brief:css:end */
+</style>
+
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">Real estate · short-term rentals · AI assistant</span>
+  <h1>What does a night in Tokyo cost, and where?</h1>
+<!-- brief:start -->
+<section class="brief" id="brief" aria-label="Project at a glance"><span class="eyebrow">At a glance</span><ol class="brief-list"><li><span class="brief-w">1 · What</span><span class="brief-main">An analytics and AI app for the Tokyo Airbnb market: dashboards, maps, a chat agent and search over guest reviews.</span></li><li><span class="brief-w">2 · Why</span><span class="brief-main">Hosts and analysts want prices, gaps and guest sentiment by neighbourhood without writing queries.</span></li><li><span class="brief-w">3 · Who</span><span class="brief-main">Users: hosts, investors and market analysts.</span><span class="brief-sub">Data: Inside Airbnb Tokyo, 27,945 listings and 444,182 reviews.</span></li><li><span class="brief-w">4 · Where</span><span class="brief-main"><a href="https://sabrinapribadi.github.io/ai-housing-analyst/">Results page</a> and <a href="https://sabrinapribadi.github.io/ai-housing-analyst/build.html">technical walkthrough</a> on GitHub Pages.</span><span class="brief-sub">The Streamlit app runs locally with an OpenAI key.</span></li><li><span class="brief-w">5 · When it fails</span><span class="brief-main">A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run.</span><span class="brief-sub">No live A/B test: there are no users. Clustering has unit tests; CI runs them on every push.</span></li><li><span class="brief-w">6 · How</span><span class="brief-main">LangChain agent with 7 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); TextBlob sentiment; K-Means areas.</span></li></ol><details class="brief-skills" open><summary>Skills applied, with proof</summary><ul><li><b>GenAI and agents</b> tool-using LangChain agent, retrieval over reviews, AI-guided data merge <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/agent.py">agent.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/rag_agent.py">rag_agent.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/discovery_agent.py">discovery_agent.py</a></li><li><b>Analytics and ML</b> EDA, K-Means geospatial clusters, review sentiment <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/analytics/eda.py">eda.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/analytics/clustering.py">clustering.py</a></li><li><b>Evaluation</b> hallucination test suite with a written checklist <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/tests/test_hallucination.py">test_hallucination.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/tests/hallucination_checklist.md">checklist</a></li><li><b>CI</b> GitHub Actions lint, unit and browser tests; Pages deploy only after they pass <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/.github/workflows/ci.yml">ci.yml</a></li></ul></details></section>
+<!-- brief:end -->
+
+  <nav class="toc" aria-label="Sections">
+    <a href="#problem"><span class="n">1</span>Problem</a><a href="#data"><span class="n">2</span>Data</a><a href="#approach"><span class="n">3</span>Approach</a>
+    <a href="#solution"><span class="n">4</span>Solution</a><a href="#take"><span class="n">5</span>Our take</a><a href="build.html">Technical walkthrough →</a>
+  </nav>
+</header>
+<main id="page"></main>
+<footer id="foot"></footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+<script>
+const PAGE = {"problem": {"points": ["Hosts and investors ask: what does a night cost here, which wards are cheaper, what do guests mention?", "The answers sit in 27,945 listings and 444,182 reviews that most people cannot query.", "Language models answer fluently but can invent numbers."], "today": ["Browse listings by hand", "Guess prices by area", "Read reviews one by one"], "project": ["Ask in plain English", "Tools compute the numbers", "Answers cite reviews"], "need": "What a user needs: typical prices by ward and room type, and what guests say, with numbers they can trust."}, "data": {"head": ["Item", "Value"], "rows": [["Source", "Inside Airbnb, Tokyo (CC BY 4.0), scraped 29–30 September 2025"], ["Listings", "27,945 (25,480 with a price)"], ["Reviews", "444,182 from the last 2 years"], ["Calendar", "10.2 million daily availability rows (no prices in this snapshot)"], ["Prices", "Yen per night, as listed (not what guests paid)"], ["Privacy", "Pages show aggregates only; no host or reviewer names"]]}, "dataNotes": ["**Median price:** half the listings cost less and half more; unlike an average, a few very expensive listings do not pull it up."], "pipeline": ["Clean prices and reviews", "Ward and room-type stats", "Agent with 7 tools", "Search over 25,000 reviews", "Check answers against the data"], "choices": {"head": ["Choice", "Tried", "Chose", "Deciding number"], "chosen": 2, "rows": [["Answering data questions", "Tool agent; generated code; plain chat", "Tool agent (7 tools)", "0 hallucinated numbers in 6 questions (recorded run)"], ["Review search", "Keyword; embeddings", "Embeddings in ChromaDB", "About $0.05 to index 25,000 reviews"], ["Sentiment", "TextBlob; VADER (cited); transformer models", "TextBlob", "No API cost; multilingual caveat stated"], ["Areas", "K-Means on location and price", "K-Means, k = 5", "k fixed; elbow search written, not used"], ["Price outlook", "Prophet on calendar prices", "On hold", "0 of 10.2 million calendar rows have a price"]]}, "tiles": [["¥16,200", "median listed price per night across 25,480 priced listings"], ["¥16,875 vs ¥12,286", "entire home vs private room, median per night"], ["0 of 6", "answers with a wrong number in the recorded check of the AI assistant"]], "charts": [{"kind": "steps", "id": "ward", "title": "What-if: pick a ward", "sub": "Median listed price per night by room type, for the 15 wards with the most listings. Hover a bar.", "sliderLabel": "Ward", "start": 0, "max": 26772.120000000003, "panels": [{"label": "Shinjuku", "bars": [{"label": "Entire home", "v": 18434.5, "text": "¥18,434", "color": "c1", "tip": ["4,196 listings", "Median ¥18,434 a night"]}, {"label": "Private room", "v": 14686.0, "text": "¥14,686", "color": "c2", "tip": ["327 listings", "Median ¥14,686 a night"]}, {"label": "Hotel room", "v": 18458.0, "text": "¥18,458", "color": "c3", "tip": ["13 listings", "Median ¥18,458 a night"]}, {"label": "Shared room", "v": 6550.0, "text": "¥6,550", "color": "c4", "tip": ["23 listings", "Median ¥6,550 a night"]}], "note": "Shinjuku: 4,559 priced listings; median **¥17,994** a night; 92% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Sumida", "bars": [{"label": "Entire home", "v": 15474.5, "text": "¥15,474", "color": "c1", "tip": ["3,302 listings", "Median ¥15,474 a night"]}, {"label": "Private room", "v": 12850.5, "text": "¥12,850", "color": "c2", "tip": ["242 listings", "Median ¥12,850 a night"]}, {"label": "Hotel room", "v": 10750.0, "text": "¥10,750", "color": "c3", "tip": ["10 listings", "Median ¥10,750 a night"]}, {"label": "Shared room", "v": 2893.0, "text": "¥2,893", "color": "c4", "tip": ["56 listings", "Median ¥2,893 a night"]}], "note": "Sumida: 3,610 priced listings; median **¥15,082** a night; 91% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Taito", "bars": [{"label": "Entire home", "v": 21858.0, "text": "¥21,858", "color": "c1", "tip": ["1,947 listings", "Median ¥21,858 a night"]}, {"label": "Private room", "v": 16123.0, "text": "¥16,123", "color": "c2", "tip": ["567 listings", "Median ¥16,123 a night"]}, {"label": "Hotel room", "v": 11829.0, "text": "¥11,829", "color": "c3", "tip": ["29 listings", "Median ¥11,829 a night"]}, {"label": "Shared room", "v": 2525.0, "text": "¥2,525", "color": "c4", "tip": ["70 listings", "Median ¥2,525 a night"]}], "note": "Taito: 2,613 priced listings; median **¥19,967** a night; 75% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Toshima", "bars": [{"label": "Entire home", "v": 15298.0, "text": "¥15,298", "color": "c1", "tip": ["2,243 listings", "Median ¥15,298 a night"]}, {"label": "Private room", "v": 11821.5, "text": "¥11,822", "color": "c2", "tip": ["208 listings", "Median ¥11,822 a night"]}], "note": "Toshima: 2,458 priced listings; median **¥14,852** a night; 91% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Shibuya", "bars": [{"label": "Entire home", "v": 22508.0, "text": "¥22,508", "color": "c1", "tip": ["1,659 listings", "Median ¥22,508 a night"]}, {"label": "Private room", "v": 12398.5, "text": "¥12,398", "color": "c2", "tip": ["96 listings", "Median ¥12,398 a night"]}], "note": "Shibuya: 1,756 priced listings; median **¥21,972** a night; 94% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Minato", "bars": [{"label": "Entire home", "v": 24789.0, "text": "¥24,789", "color": "c1", "tip": ["967 listings", "Median ¥24,789 a night"]}, {"label": "Private room", "v": 21260.5, "text": "¥21,260", "color": "c2", "tip": ["112 listings", "Median ¥21,260 a night"]}], "note": "Minato: 1,094 priced listings; median **¥24,293** a night; 88% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Ota", "bars": [{"label": "Entire home", "v": 11130.5, "text": "¥11,130", "color": "c1", "tip": ["934 listings", "Median ¥11,130 a night"]}, {"label": "Private room", "v": 9143.0, "text": "¥9,143", "color": "c2", "tip": ["125 listings", "Median ¥9,143 a night"]}], "note": "Ota: 1,066 priced listings; median **¥10,862** a night; 88% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Setagaya", "bars": [{"label": "Entire home", "v": 13112.5, "text": "¥13,112", "color": "c1", "tip": ["778 listings", "Median ¥13,112 a night"]}, {"label": "Private room", "v": 12021.5, "text": "¥12,022", "color": "c2", "tip": ["96 listings", "Median ¥12,022 a night"]}], "note": "Setagaya: 881 priced listings; median **¥12,910** a night; 88% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Katsushika", "bars": [{"label": "Entire home", "v": 16632.0, "text": "¥16,632", "color": "c1", "tip": ["758 listings", "Median ¥16,632 a night"]}, {"label": "Private room", "v": 9989.5, "text": "¥9,990", "color": "c2", "tip": ["96 listings", "Median ¥9,990 a night"]}], "note": "Katsushika: 857 priced listings; median **¥15,551** a night; 88% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Nakano", "bars": [{"label": "Entire home", "v": 15416.5, "text": "¥15,416", "color": "c1", "tip": ["732 listings", "Median ¥15,416 a night"]}, {"label": "Private room", "v": 10646.0, "text": "¥10,646", "color": "c2", "tip": ["102 listings", "Median ¥10,646 a night"]}], "note": "Nakano: 841 priced listings; median **¥14,997** a night; 87% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Kita", "bars": [{"label": "Entire home", "v": 13628.5, "text": "¥13,628", "color": "c1", "tip": ["704 listings", "Median ¥13,628 a night"]}, {"label": "Private room", "v": 9680.0, "text": "¥9,680", "color": "c2", "tip": ["97 listings", "Median ¥9,680 a night"]}], "note": "Kita: 802 priced listings; median **¥12,880** a night; 88% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Suginami", "bars": [{"label": "Entire home", "v": 13746.0, "text": "¥13,746", "color": "c1", "tip": ["499 listings", "Median ¥13,746 a night"]}, {"label": "Private room", "v": 7700.0, "text": "¥7,700", "color": "c2", "tip": ["89 listings", "Median ¥7,700 a night"]}], "note": "Suginami: 594 priced listings; median **¥12,840** a night; 84% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Edogawa", "bars": [{"label": "Entire home", "v": 15907.0, "text": "¥15,907", "color": "c1", "tip": ["465 listings", "Median ¥15,907 a night"]}, {"label": "Private room", "v": 8245.0, "text": "¥8,245", "color": "c2", "tip": ["95 listings", "Median ¥8,245 a night"]}], "note": "Edogawa: 560 priced listings; median **¥14,733** a night; 83% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Koto", "bars": [{"label": "Entire home", "v": 16019.5, "text": "¥16,020", "color": "c1", "tip": ["412 listings", "Median ¥16,020 a night"]}, {"label": "Private room", "v": 11164.5, "text": "¥11,164", "color": "c2", "tip": ["108 listings", "Median ¥11,164 a night"]}], "note": "Koto: 525 priced listings; median **¥14,667** a night; 78% are entire homes. Room types with fewer than 10 listings are hidden."}, {"label": "Itabashi", "bars": [{"label": "Entire home", "v": 13109.0, "text": "¥13,109", "color": "c1", "tip": ["386 listings", "Median ¥13,109 a night"]}, {"label": "Private room", "v": 7811.5, "text": "¥7,812", "color": "c2", "tip": ["70 listings", "Median ¥7,812 a night"]}], "note": "Itabashi: 464 priced listings; median **¥12,180** a night; 83% are entire homes. Room types with fewer than 10 listings are hidden."}]}, {"kind": "bars", "id": "wards", "title": "Median price by ward", "sub": "The 15 wards with the most priced listings, most expensive first. Hover a bar.", "rows": [{"label": "Minato", "v": 24293.0, "text": "¥24,293", "color": "c1", "tip": ["1,094 priced listings", "88% entire homes"]}, {"label": "Shibuya", "v": 21972.0, "text": "¥21,972", "color": "c1", "tip": ["1,756 priced listings", "94% entire homes"]}, {"label": "Taito", "v": 19967.0, "text": "¥19,967", "color": "c1", "tip": ["2,613 priced listings", "75% entire homes"]}, {"label": "Shinjuku", "v": 17994.0, "text": "¥17,994", "color": "c1", "tip": ["4,559 priced listings", "92% entire homes"]}, {"label": "Katsushika", "v": 15551.0, "text": "¥15,551", "color": "c1", "tip": ["857 priced listings", "88% entire homes"]}, {"label": "Sumida", "v": 15082.0, "text": "¥15,082", "color": "c1", "tip": ["3,610 priced listings", "91% entire homes"]}, {"label": "Nakano", "v": 14997.0, "text": "¥14,997", "color": "c1", "tip": ["841 priced listings", "87% entire homes"]}, {"label": "Toshima", "v": 14852.5, "text": "¥14,852", "color": "c1", "tip": ["2,458 priced listings", "91% entire homes"]}, {"label": "Edogawa", "v": 14733.0, "text": "¥14,733", "color": "c1", "tip": ["560 priced listings", "83% entire homes"]}, {"label": "Koto", "v": 14667.0, "text": "¥14,667", "color": "c1", "tip": ["525 priced listings", "78% entire homes"]}, {"label": "Setagaya", "v": 12910.0, "text": "¥12,910", "color": "c1", "tip": ["881 priced listings", "88% entire homes"]}, {"label": "Kita", "v": 12880.0, "text": "¥12,880", "color": "c1", "tip": ["802 priced listings", "88% entire homes"]}, {"label": "Suginami", "v": 12839.5, "text": "¥12,840", "color": "c1", "tip": ["594 priced listings", "84% entire homes"]}, {"label": "Itabashi", "v": 12180.0, "text": "¥12,180", "color": "c1", "tip": ["464 priced listings", "83% entire homes"]}, {"label": "Ota", "v": 10862.5, "text": "¥10,862", "color": "c1", "tip": ["1,066 priced listings", "88% entire homes"]}]}], "caveats": ["**Listed, not paid:** asking prices from one snapshot (29–30 Sep 2025); no trend over time.", "**The assistant check is small:** 6 questions, one automated numeric check, run by hand (ADR-004).", "**Sentiment is rough:** TextBlob on multilingual reviews; translation can flip polarity.", "**Cost and latency** of AI answers are not measured yet (rule R13)."], "faq": [["Where do the numbers come from?", "From the committed listings file; the assistant's tools compute them with pandas, and this page with DuckDB."], ["Can the assistant make up numbers?", "It could phrase them wrongly, which is why its tools compute every number; the recorded check found 0 wrong numbers in 6 questions."], ["Why search only 25,000 reviews?", "Enough for the questions tested, for about $0.05; all 444,182 would cost about 18 times more."], ["Is the app live?", "The Streamlit app runs locally with an OpenAI key; this page needs nothing."]], "take": ["**Start from the median by ward and room type:** a private room costs about ¥4,589 a night less than an entire home.", "**Let tools compute and the model talk:** it kept the assistant's numbers honest here.", "**Before production:** a larger labelled question set, and cost and latency measured per answer."], "changeMind": ["A labelled set where the assistant's numbers are wrong more than 1 time in 20.", "A snapshot with calendar prices, which would allow a tested price forecast."], "more": [{"id": "more-appendix", "title": "Technical appendix: the 15 wards with the most listings", "table": {"head": ["Ward", "Priced listings", "Median per night", "Entire homes"], "num": [1, 2, 3], "rows": [["Shinjuku", "4,559", "¥17,994", "92%"], ["Sumida", "3,610", "¥15,082", "91%"], ["Taito", "2,613", "¥19,967", "75%"], ["Toshima", "2,458", "¥14,852", "91%"], ["Shibuya", "1,756", "¥21,972", "94%"], ["Minato", "1,094", "¥24,293", "88%"], ["Ota", "1,066", "¥10,862", "88%"], ["Setagaya", "881", "¥12,910", "88%"], ["Katsushika", "857", "¥15,551", "88%"], ["Nakano", "841", "¥14,997", "87%"], ["Kita", "802", "¥12,880", "88%"], ["Suginami", "594", "¥12,840", "84%"], ["Edogawa", "560", "¥14,733", "83%"], ["Koto", "525", "¥14,667", "78%"], ["Itabashi", "464", "¥12,180", "83%"]]}, "points": ["Figures computed from data/processed/listings_processed.parquet when the page is built.", "Assistant: gpt-4o-mini at temperature 0 with 7 tools; review search: text-embedding-3-small at 256 dimensions, 10 nearest reviews."]}, {"id": "more-glossary", "title": "Glossary", "gloss": [["Median", "The middle value: half below, half above."], ["Ward", "One of Tokyo's 23 special wards or other municipalities in the data."], ["Tool-using agent", "An assistant that calls code to compute answers instead of writing numbers itself."], ["Retrieval", "Finding the reviews closest in meaning to a question before answering from them."], ["Hallucination", "A confident answer that the data does not support."]]}], "footer": ["Data: Inside Airbnb, Tokyo (CC BY 4.0), scraped 29–30 September 2025. Every number comes from the committed listings file.", "Sabrina Pribadi · last updated 11 Nov 2026 · [technical walkthrough](build.html) · [code and ADRs](https://github.com/sabrinapribadi/ai-housing-analyst)"]};
+</script>
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const md = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+const tip = $("#tip");
+function showTip(e, h) { tip.innerHTML = h; tip.hidden = false; const r = tip.getBoundingClientRect(), x = (e.clientX ?? 0) + 14, y = (e.clientY ?? 0) + 14;
+  tip.style.left = Math.max(8, Math.min(x, innerWidth - r.width - 8)) + "px"; tip.style.top = Math.max(8, Math.min(y, innerHeight - r.height - 8)) + "px"; }
+function hideTip() { tip.hidden = true; }
+function wire(root) {
+  root.querySelectorAll("[data-tip]").forEach(el => {
+    el.setAttribute("tabindex", "0");
+    el.addEventListener("mousemove", e => showTip(e, el.dataset.tip));
+    el.addEventListener("mouseleave", hideTip);
+    el.addEventListener("focus", () => { const r = el.getBoundingClientRect(); showTip({clientX: r.left, clientY: r.bottom}, el.dataset.tip); });
+    el.addEventListener("blur", hideTip);
+  });
+}
+addEventListener("scroll", hideTip, {passive: true});
+const tipText = (title, lines) => `<b>${esc(title)}</b>${lines.map(esc).join("<br>")}`;
+
+function bars(c) {
+  const W = 720, rowH = 26, L = 190, R = 70, H = c.rows.length * rowH + 30, max = c.max ?? Math.max(...c.rows.map(r => r.v)) * 1.08;
+  const x = v => L + (W - L - R) * v / max;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.title)}">`;
+  if (c.ref != null) s += `<line class="axis" x1="${x(c.ref)}" x2="${x(c.ref)}" y1="0" y2="${H - 22}" stroke-dasharray="4 3"/><text class="dim" x="${x(c.ref) + 4}" y="${H - 8}">${esc(c.refLabel || "")}</text>`;
+  c.rows.forEach((r, i) => {
+    const y = i * rowH + 4;
+    s += `<text x="${L - 8}" y="${y + 15}" text-anchor="end">${esc(r.label)}</text>`;
+    s += `<rect x="${L}" y="${y + 3}" width="${Math.max(2, x(r.v) - L)}" height="${rowH - 9}" rx="3" fill="var(--${r.color || "c4"})" data-tip="${esc(tipText(r.label, r.tip))}"/>`;
+    s += `<text x="${x(r.v) + 6}" y="${y + 15}" class="dim">${esc(r.text ?? r.v)}</text>`;
+  });
+  return s + "</svg>";
+}
+function dumbbell(c) {
+  const W = 720, rowH = 30, L = 150, R = 30, H = c.rows.length * rowH + 34, max = Math.max(...c.rows.flatMap(r => [r.a, r.b])) * 1.05;
+  const x = v => L + (W - L - R) * v / max;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.title)}">`;
+  c.rows.forEach((r, i) => {
+    const y = i * rowH + 16;
+    s += `<text x="${L - 8}" y="${y + 4}" text-anchor="end">${esc(r.label)}</text>`;
+    s += `<line x1="${x(r.a)}" x2="${x(r.b)}" y1="${y}" y2="${y}" stroke="var(--c4)" stroke-width="2"/>`;
+    s += `<circle cx="${x(r.a)}" cy="${y}" r="6" fill="var(--c2)" data-tip="${esc(tipText(r.label, [c.aLabel + ": " + r.a.toFixed(2), ...(r.tip || [])]))}"/>`;
+    s += `<circle cx="${x(r.b)}" cy="${y}" r="6" fill="var(--c1)" data-tip="${esc(tipText(r.label, [c.bLabel + ": " + r.b.toFixed(2), ...(r.tip || [])]))}"/>`;
+  });
+  return s + `</svg><div class="legend"><span><i style="background:var(--c2)"></i>${esc(c.aLabel)}</span><span><i style="background:var(--c1)"></i>${esc(c.bLabel)}</span></div>`;
+}
+function seriesView(c, idx) {
+  const W = 720, H = 260, L = 44, R = 12, T = 12, B = 30, p = c.panels[idx], n = p.truth.length;
+  const all = [p.truth, ...c.series.map(s => p[s.key])].flat(), lo = Math.min(...all) - 0.5, hi = Math.max(...all) + 0.5;
+  const x = i => L + (W - L - R) * i / (n - 1), y = v => T + (H - T - B) * (hi - v) / (hi - lo);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.title)}">`;
+  for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4; s += `<line class="axis" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="dim" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${(Math.round(v) || 0).toString().replace("-", "−")}</text>`; }
+  [0, 6, 12, 18, 23].forEach(i => s += `<text class="dim" x="${x(i)}" y="${H - 10}" text-anchor="${i === 0 ? "start" : i === 23 ? "end" : "middle"}">+${i + 1} h</text>`);
+  const path = (arr, col, w, dash) => `<path d="${arr.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + "," + y(v).toFixed(1)).join("")}" fill="none" stroke="var(--${col})" stroke-width="${w}" ${dash ? 'stroke-dasharray="5 4"' : ""}/>`;
+  s += path(p.truth, "fg", 2.2, false);
+  c.series.forEach(se => s += path(p[se.key], se.color, 2, true));
+  for (let i = 0; i < n; i++) {
+    const lines = [`Actual: ${p.truth[i].toFixed(1)} ${c.unit}`, ...c.series.map(se => `${se.label}: ${p[se.key][i].toFixed(1)} ${c.unit} (off by ${Math.abs(p[se.key][i] - p.truth[i]).toFixed(1)})`)];
+    s += `<rect x="${x(i) - (W - L - R) / (n - 1) / 2}" y="${T}" width="${(W - L - R) / (n - 1)}" height="${H - T - B}" fill="transparent" data-tip="${esc(tipText(p.label + " · hour +" + (i + 1), lines))}"/>`;
+  }
+  return s + "</svg>";
+}
+function chart(c) {
+  const head = `<div class="chart" id="${c.id}"><h3>${esc(c.title)}</h3>${c.sub ? `<p class="sub">${md(c.sub)}</p>` : ""}`;
+  if (c.kind === "bars") return head + bars(c) + "</div>";
+  if (c.kind === "dumbbell") return head + dumbbell(c) + "</div>";
+  if (c.kind === "steps") return head + `<div class="slider"><label for="${c.id}-s">${esc(c.sliderLabel)}</label><input type="range" id="${c.id}-s" min="0" max="${c.panels.length - 1}" value="${c.start || 0}"><span id="${c.id}-l"></span></div><div id="${c.id}-v"></div><p class="sub" id="${c.id}-m"></p></div>`;
+  if (c.kind === "series") return head + `<div class="slider"><label for="${c.id}-s">${esc(c.sliderLabel)}</label><input type="range" id="${c.id}-s" min="0" max="${c.panels.length - 1}" value="${c.start || 0}"><span id="${c.id}-l"></span></div><div id="${c.id}-v"></div>` +
+    `<div class="legend"><span><i style="background:var(--fg)"></i>Actual</span>${c.series.map(s => `<span><i style="background:var(--${s.color})"></i>${esc(s.label)}</span>`).join("")}</div><p class="sub" id="${c.id}-m"></p></div>`;
+  return "";
+}
+function drawSeries(c) {
+  const inp = $(`#${c.id}-s`), draw = () => { const i = +inp.value, p = c.panels[i];
+    $(`#${c.id}-v`).innerHTML = seriesView(c, i); $(`#${c.id}-l`).textContent = p.label;
+    $(`#${c.id}-m`).innerHTML = c.series.map(s => `${esc(s.label)} misses by ${p[s.key + "_mae"].toFixed(2)} ${c.unit} on average this day`).join(" · ");
+    wire($(`#${c.id}-v`)); };
+  inp.addEventListener("input", draw); draw();
+}
+function drawSteps(c) {
+  const inp = $(`#${c.id}-s`), draw = () => { const p = c.panels[+inp.value];
+    $(`#${c.id}-v`).innerHTML = bars({title: c.title, rows: p.bars, max: c.max}); $(`#${c.id}-l`).textContent = p.label;
+    $(`#${c.id}-m`).innerHTML = md(p.note); wire($(`#${c.id}-v`)); };
+  inp.addEventListener("input", draw); draw();
+}
+const list = a => `<ul class="points">${a.map(t => `<li>${md(t)}</li>`).join("")}</ul>`;
+const table = t => `<div class="scroll"><table><thead><tr>${t.head.map((h, k) => `<th${(t.num || []).includes(k) ? ' class="num"' : ""}>${esc(h)}</th>`).join("")}</tr></thead><tbody>${
+  t.rows.map(r => `<tr>${r.map((v, k) => `<td${(t.num || []).includes(k) ? ' class="num"' : ""}${k === t.chosen ? ' class="chosen"' : ""}>${md(String(v))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+const P = PAGE;
+$("#page").innerHTML = `
+<section class="block" id="problem"><div class="sec-head"><span class="n">1</span><h2>Problem</h2></div>
+  <div class="cols"><div class="box">${list(P.problem.points)}</div>
+  <div class="box"><span class="eyebrow">Today vs this project</span>
+    <div class="flow">${P.problem.today.map(t => `<span>${esc(t)}</span>`).join("<i>→</i>")}</div>
+    <div class="flow">${P.problem.project.map(t => `<span class="now">${esc(t)}</span>`).join("<i>→</i>")}</div>
+    <p class="sub" style="margin:0;font-size:13.5px;color:var(--muted)">${md(P.problem.need)}</p></div></div></section>
+<section class="block" id="data"><div class="sec-head"><span class="n">2</span><h2>Data</h2></div>${table(P.data)}${list(P.dataNotes)}</section>
+<section class="block" id="approach"><div class="sec-head"><span class="n">3</span><h2>Approach and model choice</h2></div>
+  <div class="flow">${P.pipeline.map((t, i) => `<span>${i + 1}. ${esc(t)}</span>`).join("<i>→</i>")}</div>${table(P.choices)}</section>
+<section class="block" id="solution"><div class="sec-head"><span class="n">4</span><h2>Solution</h2></div>
+  <div class="tiles">${P.tiles.map(t => `<div class="tile"><b>${esc(t[0])}</b><span>${md(t[1])}</span></div>`).join("")}</div>
+  ${P.charts.map(chart).join("")}
+  <div class="cols"><div class="box"><span class="eyebrow">Caveats</span>${list(P.caveats)}</div>
+  <div class="box"><span class="eyebrow">FAQ</span><div class="faq">${P.faq.map(q => `<details><summary>${esc(q[0])}</summary><div class="body">${md(q[1])}</div></details>`).join("")}</div></div></div></section>
+<section class="block" id="take"><div class="sec-head"><span class="n">5</span><h2>Our take</h2></div>
+  <div class="cols"><div class="box">${list(P.take)}</div><div class="box"><span class="eyebrow">What would change our mind</span>${list(P.changeMind)}</div></div></section>
+<section class="block">${P.more.map(m => `<details class="more" id="${m.id}"><summary>${esc(m.title)}</summary><div class="body">${
+  (m.charts || []).map(chart).join("")}${m.table ? table(m.table) : ""}${m.points ? list(m.points) : ""}${
+  m.gloss ? `<dl class="gloss">${m.gloss.map(g => `<dt>${esc(g[0])}</dt><dd>${md(g[1])}</dd>`).join("")}</dl>` : ""}</div></details>`).join("")}</section>`;
+$("#foot").innerHTML = P.footer.map(f => `<span>${md(f)}</span>`).join("");
+wire(document);
+[...P.charts, ...P.more.flatMap(m => m.charts || [])].filter(c => c.kind === "series").forEach(drawSeries);
+[...P.charts, ...P.more.flatMap(m => m.charts || [])].filter(c => c.kind === "steps").forEach(drawSteps);
+document.querySelectorAll("a[href^='#']").forEach(a => a.addEventListener("click", () => { const d = document.getElementById(a.getAttribute("href").slice(1)); if (d && d.tagName === "DETAILS") d.open = true; }));
+</script>

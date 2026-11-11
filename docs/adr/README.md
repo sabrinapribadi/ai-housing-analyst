@@ -1,0 +1,20 @@
+# Architecture Decision Records
+
+Written retrospectively on 2026-11-11 from the code and PRD (the decisions date from June 2026).
+
+| ADR | Decision | Status | Summary |
+|---|---|---|---|
+| [ADR-001](ADR-001-framing-and-data.md) | Framing and data | Accepted | One Inside Airbnb Tokyo snapshot (Sep 2025): 27,945 listings, 444,182 reviews; aggregates only on pages. |
+| [ADR-002](ADR-002-tool-using-agent.md) | Tool-using agent | Accepted | gpt-4o-mini with 7 tools; numbers computed by tools, not the model. |
+| [ADR-003](ADR-003-review-retrieval.md) | Retrieval over reviews | Accepted | 25,000 reviews embedded (256 dimensions) in ChromaDB; answers cite sources. |
+| [ADR-004](ADR-004-hallucination-checks.md) | Hallucination checks | Accepted | 6 fixed questions vs Parquet ground truth; 0 in the recorded run; limits stated. |
+| [ADR-005](ADR-005-analytics-methods.md) | Analytics methods | Accepted | TextBlob sentiment and K-Means areas, not validated against labels; Prophet forecast on hold (calendar has no prices). |
+
+## Decision Dependencies
+
+```
+ADR-001 (framing and data)
+  ├── ADR-002 (tool-using agent) ── ADR-004 (hallucination checks)
+  ├── ADR-003 (retrieval over reviews)
+  └── ADR-005 (analytics methods)
+```

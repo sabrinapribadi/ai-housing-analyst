@@ -13,24 +13,25 @@ brief:
       - "Data: Inside Airbnb Tokyo, 27,945 listings and 444,182 reviews."
   - w: Where
     lines:
-      - A Streamlit app that runs locally; no public deployment yet.
+      - "[Results page](https://sabrinapribadi.github.io/ai-housing-analyst/) and [technical walkthrough](https://sabrinapribadi.github.io/ai-housing-analyst/build.html) on GitHub Pages."
+      - The Streamlit app runs locally with an OpenAI key.
   - w: When it fails
     lines:
       - "A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run."
       - "No live A/B test: there are no users. Clustering has unit tests; CI runs them on every push."
   - w: How
     lines:
-      - LangChain agent with 8 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); K-Means areas; Prophet forecast.
+      - LangChain agent with 7 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); TextBlob sentiment; K-Means areas.
 skills:
   - group: GenAI and agents
     what: tool-using LangChain agent, retrieval over reviews, AI-guided data merge
     proof: [["agent.py", "src/agent/agent.py"], ["rag_agent.py", "src/agent/rag_agent.py"], ["discovery_agent.py", "src/agent/discovery_agent.py"]]
   - group: Analytics and ML
-    what: EDA, K-Means geospatial clusters, Prophet forecast
-    proof: [["clustering.py", "src/analytics/clustering.py"], ["forecast.py", "src/models/forecast.py"]]
+    what: EDA, K-Means geospatial clusters, review sentiment
+    proof: [["eda.py", "src/analytics/eda.py"], ["clustering.py", "src/analytics/clustering.py"]]
   - group: Evaluation
     what: hallucination test suite with a written checklist
     proof: [["test_hallucination.py", "tests/test_hallucination.py"], ["checklist", "tests/hallucination_checklist.md"]]
   - group: CI
-    what: GitHub Actions lint and unit tests on every push
+    what: GitHub Actions lint, unit and browser tests; Pages deploy only after they pass
     proof: [["ci.yml", ".github/workflows/ci.yml"]]
