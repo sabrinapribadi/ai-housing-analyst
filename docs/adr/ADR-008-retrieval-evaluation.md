@@ -56,6 +56,10 @@
 - **Positive:** the first measured retrieval quality for this app; contexts for ADR-009 are fixed by this decision.
 - **Negative:** labels come from a model until the human audit is done; one snapshot, one city.
 
+## Deviations from the pre-registration
+
+1. **Tokyo-wide question share (2026-11-11, before any retrieval, answer or label existed).** The registered `scoped_share: 0.4` (60% Tokyo-wide) cannot be met: each facet has one Tokyo-wide pair but 22 ward pairs, so unique Tokyo-wide questions run out. Facets were widened to 64 (4 per aspect; aspects unchanged) and Tokyo-wide questions are drawn as far as the pool allows. Actual shares: train 5.6%, validation 12%, test 2.3% Tokyo-wide; the rest name one ward. Counts (2,000 / 100 / 270 + 30) are unchanged.
+
 ## Empirical Results
 
 _Appended after the run._

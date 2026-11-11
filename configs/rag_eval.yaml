@@ -20,7 +20,7 @@ questions:
     managed: [noise, transport access, wifi and workspace, kitchen and amenities, space and layout,
               families with children, luggage, bathroom and shower, bed comfort, air conditioning and heating]
   ward_min_docs: 200          # a ward-scoped question needs at least this many indexed reviews in that ward
-  scoped_share: 0.4           # share of questions limited to one ward
+  scoped_share: 0.4           # target; deviation 1 (ADR-008/009): Tokyo-wide questions capped by the unique pool, actual test share 2.3%
   phrasings_per_aspect: 3     # one phrasing per aspect is held out for test only
   n_train: 2000               # teacher answers for LoRA (before filtering)
   n_val: 100
