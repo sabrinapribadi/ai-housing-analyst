@@ -1,6 +1,6 @@
 # ADR-003: Retrieval over Guest Reviews
 
-**Status:** Accepted — written retrospectively on 2026-11-11 from the code and PRD; the decision dates from June 2026
+**Status:** Accepted, amended 2026-11-12 (answer model and prompt; see ADR-009). Written retrospectively on 2026-11-11; the decision dates from June 2026
 **Date:** 2026-11-11
 **Deciders:** Sabrina Pribadi
 
@@ -18,7 +18,10 @@
 ## Decision
 
 - **Index:** 25,000 reviews embedded with OpenAI `text-embedding-3-small` at 256 dimensions, stored in ChromaDB (`scripts/build_review_index.py`); about $0.05 one time.
-- **Answer:** the 10 nearest reviews go to `gpt-4o-mini` (temperature 0), which answers from them; sources are shown, auto-translated to English with the original kept (`src/agent/rag_agent.py`).
+- **Answer:** the 10 nearest reviews go to the answer model, which answers from them; sources are shown, auto-translated to English with the original kept (`src/agent/rag_agent.py`).
+  - June 2026 to 11 Nov 2026: `gpt-4o-mini`, temperature 0, no per-claim citations.
+  - **From 12 Nov 2026 (ADR-009):** `gpt-6-luna` with a prompt that cites a review id after each claim (`src/agent/review_answer.py`); tokens, latency and cost shown per answer; a no-cost fallback quotes the top reviews if the API fails. Measured on 300 questions: fully grounded answers 78% vs 1% (strict judge) and 90% vs 83% (lenient judge); $0.178 vs $0.265 per 1,000 answers.
+  - Retrieval is unchanged: the reranked search that won ADR-008 needs a GPU, which the free app host lacks.
 
 ## Considered Options (SOTA comparison: tested here vs cited only, R2)
 

@@ -12,8 +12,7 @@ from typing import Optional
 import pandas as pd
 import chromadb
 from openai import OpenAI
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, SystemMessage
+from src.agent.review_answer import answer as cited_answer
 
 logger = logging.getLogger(__name__)
 
@@ -24,25 +23,15 @@ EMBED_DIMS   = 256      # text-embedding-3-small supports matryoshka reduction
 EMBED_MODEL  = "text-embedding-3-small"
 EMBED_BATCH  = 100      # safe OpenAI batch size
 
-_SYSTEM_PROMPT = """You answer questions about Tokyo Airbnb guest experiences
-using ONLY the review excerpts provided below.
-
-Rules:
-1. Ground every claim in the retrieved text — quote or paraphrase directly.
-2. If reviews are mixed (some positive, some negative), reflect that honestly.
-3. Mention neighbourhoods when relevant patterns emerge.
-4. Be concise: 3–5 sentences, use bullet points for lists.
-5. Never invent information not present in the reviews."""
 
 
 class ReviewRAGAgent:
-    """Semantic review search: embed → retrieve → synthesise with GPT-4o-mini."""
+    """Semantic review search: embed → retrieve → cited answer with gpt-6-luna (ADR-009)."""
 
     def __init__(self, api_key: Optional[str] = None):
         self._api_key = api_key or os.getenv("OPENAI_API_KEY")
         self._chroma: Optional[chromadb.PersistentClient] = None
         self._col = None
-        self._llm: Optional[ChatOpenAI] = None
 
     # ── Lazy properties ───────────────────────────────────────────────────────
 
@@ -64,16 +53,6 @@ class ReviewRAGAgent:
                 metadata={"hnsw:space": "cosine"},
             )
         return self._col
-
-    @property
-    def llm(self) -> ChatOpenAI:
-        if self._llm is None:
-            self._llm = ChatOpenAI(
-                model="gpt-4o-mini",
-                temperature=0,
-                api_key=self._api_key,
-            )
-        return self._llm
 
     # ── Index management ──────────────────────────────────────────────────────
 
@@ -182,23 +161,19 @@ class ReviewRAGAgent:
                 "sources": [],
             }
 
-        context = "\n\n".join(
-            f"[{m.get('neighbourhood', 'Unknown')}] {d}"
-            for d, m in zip(docs, metas)
-        )
-
-        response = self.llm.invoke([
-            SystemMessage(content=_SYSTEM_PROMPT),
-            HumanMessage(content=f"Question: {question}\n\nReviews:\n{context}"),
-        ])
+        ids = results["ids"][0]
+        out = cited_answer(self._openai, question, list(zip(ids, docs)))   # R13: tokens, latency, cost per call
 
         sources = [
             {
+                "id":            i,
                 "text":          d,
                 "neighbourhood": m.get("neighbourhood", ""),
                 "similarity":    round(1.0 - dist, 3),
+                "cited":         i in out["cited_ids"],
             }
-            for d, m, dist in zip(docs, metas, dists)
+            for i, d, m, dist in zip(ids, docs, metas, dists)
         ]
 
-        return {"answer": response.content, "sources": sources}
+        return {"answer": out["answer"], "sources": sources,
+                "usage": {k: out[k] for k in ("model", "tokens_in", "tokens_out", "latency_s", "cost_usd")}}

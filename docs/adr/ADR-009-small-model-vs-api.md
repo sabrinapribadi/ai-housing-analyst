@@ -1,6 +1,6 @@
 # ADR-009: Fine-Tuned Small Open Model vs API Model for Review Answers
 
-**Status:** Proposed — pre-registered 2026-11-11 before any run; results appended below
+**Status:** Accepted — pre-registered 2026-11-11 before any run; **G2, G3 and G4 failed**; the app switches from gpt-4o-mini to gpt-6-luna (results below)
 **Date:** 2026-11-11
 **Deciders:** Sabrina Pribadi
 
@@ -78,9 +78,55 @@
 
 1. **Tokyo-wide question share (2026-11-11, before any retrieval, answer or label existed).** The registered `scoped_share: 0.4` (60% Tokyo-wide) cannot be met: each facet has one Tokyo-wide pair but 22 ward pairs, so unique Tokyo-wide questions run out. Facets were widened to 64 (4 per aspect; aspects unchanged) and Tokyo-wide questions are drawn as far as the pool allows. Actual shares: train 5.6%, validation 12%, test 2.3% Tokyo-wide; the rest name one ward. Counts (2,000 / 100 / 270 + 30) are unchanged.
 
-## Empirical Results
+## Empirical Results (2026-11-12)
 
-_Appended after the run._
+**Setup as registered:** 300 test questions (270 answerable, 30 out of scope); every system saw the same top 10 reviews from R4 (ADR-008). Teacher: 2,100 Qwen3-8B answers, 1,863 train + 94 validation kept by the filter (106 abstentions, 14 invalid citations, 23 off-length dropped). LoRA: 2 epochs on 2× T4, about 2.2 hours per seed; validation loss 0.469 / 0.472 / 0.469 (seeds 0 / 1 / 2), epoch 2 kept for all.
+
+**Answer quality (answerable questions; primary judge gpt-6.1-terra / cross-check judge Qwen3-8B):**
+
+| System | Grounded answers | Supported sentences | Answers the question | Valid citations (code) | Abstains when reviews are silent (code) |
+|---|---|---|---|---|---|
+| A1 gpt-6-luna | **77.8% / 90.4%** | 92.0% / 99.3% | 96.3% / 99.6% | 91.8% | 96.7% |
+| A0 gpt-4o-mini (old production) | 1.1% / 82.6% | 47.3% / 97.9% | 91.1% / 100% | 88.9% | 100% |
+| S0 Qwen3-1.7B, no tuning | 0.7% / 23.0% | 23.6% / 80.2% | 67.8% / 97.4% | 70.7% | 53.3% |
+| S1 Qwen3-1.7B + LoRA, seed 0 | 3.3% / 72.2% | 47.4% / 92.9% | 89.6% / 100% | 95.9% | **0%** |
+| S1 seeds 1 / 2 | 1.8%, 4.1% / 70.0%, 71.5% | 43.0%, 44.6% / 92.4%, 92.8% | — | 94.8%, 95.2% | 0%, 0% |
+
+- **What "grounded answer" means:** at least one citation, every cited id in the context, every sentence backed by the reviews it cites, and the question answered. One uncited claim fails the answer.
+- **Why the judges differ:** they agree on 47% of gpt-4o-mini's sentence verdicts. The primary judge applies the registered rule that an uncited new claim is unsupported (it marks 54% of gpt-4o-mini's sentences unsupported); the cross-check judge marks 2%. gpt-4o-mini and S1 open 94% and 81% of answers with an uncited summary sentence; gpt-6-luna 11%. Human audit of 50 judgements: **open**, and it decides which judge to trust on this rule.
+- **Seed stability:** spread of 2.3 points (primary) and 2.2 points (cross) across seeds, under the 5-point flag.
+
+**Speed and cost (one T4 for S0/S1; API from the development machine):**
+
+| System | p50 / p95, one at a time | p95, 8 at a time | Answers per second (8 at a time) | Cost per 1,000 answers |
+|---|---|---|---|---|
+| A1 gpt-6-luna | 2.76 s / 4.50 s | — | — | **$0.178** (measured tokens) |
+| A0 gpt-4o-mini | 2.47 s / 3.63 s (partly during a network outage) | — | — | $0.265 |
+| S1 LoRA adapter (gated) | 6.57 s / 9.32 s | 24.3 s | 0.51 | $0.571 at 50% GPU use ($2.85 at 10%, $0.285 at 100%) |
+| S1 merged weights | 2.87 s / 3.94 s | 14.8 s | 0.82 | $0.356 at 50% ($0.178 at 100%) |
+| S0 base model | 2.50 s / 3.89 s | 16.1 s | 0.95 | $0.309 at 50% |
+
+Self-hosted cost = $0.526 per T4-hour × hours for 1,000 answers at the measured throughput ÷ utilisation.
+
+**Gates:**
+
+| Gate | Primary judge | Cross-check judge | Result |
+|---|---|---|---|
+| G2 fine-tuning helps (S1 − S0 ≥ +10 points) | +2.6 (+0.4 to +5.2) | +49.3 (+42.6 to +55.9) | **Fail** (judges disagree) |
+| G3 no worse than the API (S1 − A1 lower bound ≥ −5; citations ≥ 95%; abstention ≥ 80%) | −74.4 (−80.0 to −68.5) | −18.1 (−24.1 to −12.2) | **Fail** (both judges; abstention 0%) |
+| G4 operations (p95 ≤ 3.0 s / 6.0 s; cost ≤ A1) | 9.3 s / 24.3 s; $0.571 vs $0.178 | — | **Fail**: break-even needs 160% GPU use |
+
+**Decision:**
+1. Keep an API model; do not serve S1. S1 stays documented as an offline, no-key option, but it must learn to abstain first.
+2. **Switch the app's review answers from gpt-4o-mini to gpt-6-luna**, with the study's cited-answer prompt. gpt-6-luna beats gpt-4o-mini under both judges: grounded answers +76.7 points (+71.1 to +81.9) strict, +7.8 points (+4.1 to +11.5) lenient; and it is 33% cheaper ($0.178 vs $0.265 per 1,000). Its p95 of 4.5 s misses the 3.0 s budget, like gpt-4o-mini's 3.6 s.
+3. The 7-tool data agent keeps gpt-4o-mini: this study did not test it.
+
+**Why the small model failed:**
+- **No abstention:** the registered filter required a citation, so all 106 teacher abstentions were removed; the student never saw one. Next time, keep abstentions as their own class.
+- **Copied style:** the teacher opened with an uncited summary sentence and the student learned it. Filter on per-sentence citations.
+- **Hardware:** a T4 decodes about 17 tokens per second per request with a LoRA adapter; merging the adapter halves latency, but a GPU only beats per-token pricing at very high, steady load.
+
+**Spend:** OpenAI $4.02 of the $5 cap (relevance labels $0.50, answers $0.08 + $0.09, judging $3.07 including $0.29 lost to an interrupted unsaved run, plus probes). Kaggle GPU: about 11 hours of the free weekly quota.
 
 ## Related Decisions
 

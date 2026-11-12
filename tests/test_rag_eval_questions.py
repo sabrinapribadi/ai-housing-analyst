@@ -40,3 +40,26 @@ def test_answer_code_checks():
     assert not none["citations_valid"]
     ab = code_checks(ABSTAIN, ["rev_1"])
     assert ab["abstained"] and not ab["citations_valid"]
+
+
+def test_review_answer_cost_and_fallback():
+    """App answers (ADR-009): tokens and cost reported per call; an API failure falls back to quoted reviews at no cost."""
+    from types import SimpleNamespace
+
+    from src.agent.review_answer import answer
+
+    docs = [("rev_1", "Quiet street, five minutes to the station."), ("rev_2", "Thin walls, heard neighbours.")]
+
+    class Ok:
+        responses = SimpleNamespace(create=lambda **kw: SimpleNamespace(
+            output_text="Quiet street [rev_1]. Thin walls [rev_2][rev_9].", usage=SimpleNamespace(input_tokens=1000, output_tokens=100)))
+
+    r = answer(Ok(), "Is it quiet?", docs)
+    assert r["model"] == "gpt-6-luna" and r["cited_ids"] == ["rev_1", "rev_2"]
+    assert abs(r["cost_usd"] - (1000 * 0.10 + 100 * 0.50) / 1e6) < 1e-12
+
+    class Down:
+        responses = SimpleNamespace(create=lambda **kw: (_ for _ in ()).throw(RuntimeError("down")))
+
+    f = answer(Down(), "Is it quiet?", docs)
+    assert f["model"] == "fallback" and f["cost_usd"] == 0 and "[rev_1]" in f["answer"]

@@ -190,7 +190,7 @@ footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
   <span class="eyebrow">Technical walkthrough · Tokyo Airbnb analyst</span>
   <h1>How the Tokyo Airbnb analyst was built, phase by phase</h1>
 <!-- brief:start -->
-<section class="brief" id="brief" aria-label="Project at a glance"><span class="eyebrow">At a glance</span><ol class="brief-list"><li><span class="brief-w">1 · What</span><span class="brief-main">An analytics and AI app for the Tokyo Airbnb market: dashboards, maps, a chat agent and search over guest reviews.</span></li><li><span class="brief-w">2 · Why</span><span class="brief-main">Hosts and analysts want prices, gaps and guest sentiment by neighbourhood without writing queries.</span></li><li><span class="brief-w">3 · Who</span><span class="brief-main">Users: hosts, investors and market analysts.</span></li><li><span class="brief-w">4 · Where</span><span class="brief-main"><a href="https://sabrinapribadi.github.io/ai-housing-analyst/">Results page</a> and <a href="https://sabrinapribadi.github.io/ai-housing-analyst/build.html">technical walkthrough</a> on GitHub Pages.</span></li><li><span class="brief-w">5 · When it fails</span><span class="brief-main">A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run.</span></li><li><span class="brief-w">6 · How</span><span class="brief-main">LangChain agent with 7 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); TextBlob sentiment; K-Means areas.</span></li></ol><details class="brief-skills"><summary>Skills applied, with proof</summary><ul><li><b>GenAI and agents</b> tool-using LangChain agent, retrieval over reviews, AI-guided data merge <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/agent.py">agent.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/rag_agent.py">rag_agent.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/discovery_agent.py">discovery_agent.py</a></li><li><b>Analytics and ML</b> EDA, K-Means geospatial clusters, review sentiment <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/analytics/eda.py">eda.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/analytics/clustering.py">clustering.py</a></li><li><b>Evaluation</b> hallucination test suite with a written checklist <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/tests/test_hallucination.py">test_hallucination.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/tests/hallucination_checklist.md">checklist</a></li><li><b>CI</b> GitHub Actions lint, unit and browser tests; Pages deploy only after they pass <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/.github/workflows/ci.yml">ci.yml</a></li></ul></details></section>
+<section class="brief" id="brief" aria-label="Project at a glance"><span class="eyebrow">At a glance</span><ol class="brief-list"><li><span class="brief-w">1 · What</span><span class="brief-main">An analytics and AI app for the Tokyo Airbnb market: dashboards, maps, a chat agent and search over guest reviews.</span></li><li><span class="brief-w">2 · Why</span><span class="brief-main">Hosts and analysts want prices, gaps and guest sentiment by neighbourhood without writing queries.</span></li><li><span class="brief-w">3 · Who</span><span class="brief-main">Users: hosts, investors and market analysts.</span></li><li><span class="brief-w">4 · Where</span><span class="brief-main"><a href="https://sabrinapribadi.github.io/ai-housing-analyst/">Results page</a> and <a href="https://sabrinapribadi.github.io/ai-housing-analyst/build.html">technical walkthrough</a> on GitHub Pages.</span></li><li><span class="brief-w">5 · When it fails</span><span class="brief-main">A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run.</span></li><li><span class="brief-w">6 · How</span><span class="brief-main">LangChain agent with 7 tools over the listings; review answers by gpt-6-luna with a citation after each claim, chosen over gpt-4o-mini (fully grounded 78% vs 1%, 33% cheaper) and a fine-tuned small model; K-Means areas.</span></li></ol><details class="brief-skills"><summary>Skills applied, with proof</summary><ul><li><b>GenAI and agents</b> tool-using LangChain agent, retrieval over reviews, AI-guided data merge <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/agent.py">agent.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/rag_agent.py">rag_agent.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/discovery_agent.py">discovery_agent.py</a></li><li><b>Analytics and ML</b> EDA, K-Means geospatial clusters, review sentiment <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/analytics/eda.py">eda.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/analytics/clustering.py">clustering.py</a></li><li><b>Evaluation</b> retrieval nDCG with blind model-graded labels, two-judge grounding checks, paired bootstrap, pre-registered gates <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/docs/adr/ADR-008-retrieval-evaluation.md">ADR-008</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/docs/adr/ADR-009-small-model-vs-api.md">ADR-009</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/tests/test_hallucination.py">test_hallucination.py</a></li><li><b>Fine-tuning and serving</b> LoRA on Qwen3-1.7B from open-teacher answers (PEFT, TRL), vLLM serving benchmark, cost per 1,000 answers <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/kaggle/lora/train_lora.py">train_lora.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/kaggle/bench/bench.py">bench.py</a> <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/src/agent/review_answer.py">review_answer.py</a></li><li><b>CI</b> GitHub Actions lint, unit and browser tests; Pages deploy only after they pass <a class="brief-proof" href="https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/.github/workflows/ci.yml">ci.yml</a></li></ul></details></section>
 <!-- brief:end -->
 
   <div class="links">
@@ -233,7 +233,8 @@ footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
 const P = {updated: '11 Nov 2026'};
 const REPO = "https://github.com/sabrinapribadi/ai-housing-analyst/blob/main/";
 const ADR = {"001": "docs/adr/ADR-001-framing-and-data.md", "002": "docs/adr/ADR-002-tool-using-agent.md", "003": "docs/adr/ADR-003-review-retrieval.md",
-  "004": "docs/adr/ADR-004-hallucination-checks.md", "005": "docs/adr/ADR-005-analytics-methods.md"};
+  "004": "docs/adr/ADR-004-hallucination-checks.md", "005": "docs/adr/ADR-005-analytics-methods.md",
+  "006": "docs/adr/ADR-006-industry-alignment.md", "007": "docs/adr/ADR-007-technology-assessment.md", "008": "docs/adr/ADR-008-retrieval-evaluation.md", "009": "docs/adr/ADR-009-small-model-vs-api.md"};
 const LANES = ["Data (Inside Airbnb)", "Analytics", "AI assistant", "Evaluation", "App & UI", "Platform & CI", "Decision"];
 
 const PHASES = [
@@ -323,22 +324,93 @@ const PHASES = [
     ["Decision", "ADRs written", "Five decisions recorded from the code and PRD, with evidence tables.", "Rules R2 and R4.", "docs/adr/README.md"],
     ["App & UI", "Results page", "Prices by ward and room type, a ward what-if, and the assistant's checks.", "Readable in about two minutes.", "docs/index.html"],
     ["Platform & CI", "CI", "Lint, unit tests, brief check and browser tests; Pages deploy only after they pass.", "Rule R19.", ".github/workflows/ci.yml"],
-    ["Evaluation", "Cost and latency", "Not yet measured for AI answers.", "Rule R13 gap.", "planned", "plan"]
+    ["Evaluation", "Cost and latency", "Not measured at this phase; measured in P10.", "Rule R13 gap.", "planned", "plan"]
   ],
-  decisions: [], results: [["Browser checks", "all pass", "all pass", "ok"], ["AI cost and latency (R13)", "measured", "not measured", "wait"]],
+  decisions: [], results: [["Browser checks", "all pass", "all pass", "ok"], ["AI cost and latency (R13)", "measured", "not measured here (done in P10)", "wait"]],
   obstacles: [["The PRD lived at the repo root", "Older layout", "Moved to docs/PRD.md", "Follow the house layout"]],
   lessons: ["Record decisions when they are made; writing them later loses the alternatives' numbers."],
   star: "I documented the project to the portfolio's standard and listed what is still unmeasured."
+},
+{
+  id: "p7", tag: "P7", name: "Pre-registration", dates: "11 Nov 2026", verdict: ["pass", "written first"],
+  scqa: ["Review answers used gpt-4o-mini with unmeasured grounding, cost and speed.", "A fine-tuned small open model might be cheaper and keep data in-house, or might not.",
+         "What would count as success, decided before any run?", "Four ADRs, one config and three gates committed before any data, answer or label existed."],
+  steps: [
+    ["Decision", "Industry alignment", "Airbnb's six rated categories plus aspects hosts manage; Japan's Minpaku duties.", "Questions hosts ask.", "docs/adr/ADR-006-industry-alignment.md"],
+    ["Decision", "Technology assessment", "Licences checked at source; Qwen3-1.7B student, Qwen3-8B teacher; gated models on hold.", "Clean licences, zero cost.", "docs/adr/ADR-007-technology-assessment.md"],
+    ["Evaluation", "Gates written first", "G1 search; G2 fine-tuning helps; G3 no worse than the API; G4 speed and cost.", "No moving goalposts.", "configs/rag_eval.yaml"],
+    ["Platform & CI", "Spend ledger", "Every OpenAI call logged; calls refused past $5.", "Rule R13.", "src/rag_eval/ledger.py"]
+  ],
+  decisions: [["Industry framing", "006"], ["Technology choices", "007"]],
+  results: [["Design committed before any run", "yes", "yes", "ok"]],
+  obstacles: [["Too few Tokyo-wide questions", "One per facet, but 22 ward versions", "Logged deviation; actual shares reported", "Count the question pool before fixing shares"]],
+  lessons: ["Write the bar first, then the code."],
+  star: "I fixed the pass bars, both judges and the budget before generating a single answer."
+},
+{
+  id: "p8", tag: "P8", name: "Search quality", dates: "11 Nov 2026", verdict: ["pass", "+0.087 nDCG@10"],
+  scqa: ["Answers can only be as good as the reviews found.", "Search quality had never been measured; a third of reviews are in Chinese, Japanese or Korean.",
+         "Does a keyword, multilingual, hybrid or reranked search find better evidence?", "Yes: reranking lifts nDCG@10 from 0.459 to 0.545 (interval +0.021 to +0.153)."],
+  steps: [
+    ["Data (Inside Airbnb)", "Exact corpus", "Rebuilt the 25,000 indexed reviews; all 25,000 match production.", "Test what users get.", "src/rag_eval/corpus.py"],
+    ["AI assistant", "Five systems", "Today's embeddings, BM25, bge-m3, fusion, fusion + reranker (Kaggle T4).", "Compare like with like.", "kaggle/retrieval/retrieval_gpu.py"],
+    ["Evaluation", "Blind labels", "3,248 reviews graded 0–3 by gpt-6.1-terra without system names ($0.50).", "Graded relevance.", "src/rag_eval/judge.py"],
+    ["Evaluation", "Choose, then confirm", "Best chosen on 40 queries, tested on 80 others with a paired bootstrap.", "No lucky picks.", "scripts/rag_eval_g1.py"]
+  ],
+  decisions: [["Reranked fusion for the study; app keeps today's search", "008"]],
+  results: [["nDCG@10 gain over today", "≥ +0.03, interval > 0", "+0.087 (+0.021 to +0.153)", "ok"]],
+  obstacles: [["Judge calls rejected", "JSON mode needs the word JSON in the input", "Added one line to the prompt; rejected calls cost nothing", "Probe one call before a batch"],
+              ["Reranker too slow for the free app", "0.69 s per question needs a GPU", "App keeps today's search (logged deviation)", "Measure serving cost before promising adoption"]],
+  lessons: ["The gain came from reading question and review together, not from a new embedding model."],
+  star: "I found a search that retrieves about one more useful review in ten, and said why the app cannot use it yet."
+},
+{
+  id: "p9", tag: "P9", name: "Teacher and fine-tuning", dates: "11–12 Nov 2026", verdict: ["pass", "built"],
+  scqa: ["A small model needs examples of good answers.", "API outputs should not train another model.",
+         "Can an open teacher produce training data, and does LoRA train stably on a free GPU?", "Yes: 1,863 filtered teacher answers; three seeds within 0.003 validation loss."],
+  steps: [
+    ["AI assistant", "Open teacher", "Qwen3-8B on two T4s wrote 2,100 cited answers in 55 minutes.", "No API outputs in training.", "kaggle/teacher/teacher.py"],
+    ["Evaluation", "Filter", "Kept answers with 25–180 words and valid citations; abstentions dropped.", "As registered.", "kaggle/lora/train_lora.py"],
+    ["AI assistant", "LoRA, 3 seeds", "Rank 16, 2 epochs, serving chat template, loss on the answer only.", "Stability check.", "kaggle/lora/train_lora.py"],
+    ["Platform & CI", "Free GPU", "Kaggle T4s; about 11 GPU hours in all.", "Rule R20.", "kaggle/"]
+  ],
+  decisions: [["LoRA on Qwen3-1.7B from an open teacher", "009"]],
+  results: [["Training examples kept", "—", "1,863 + 94 validation", ""], ["Seed spread (validation loss)", "small", "0.469–0.472", "ok"]],
+  obstacles: [["Teacher crashed at start", "Two-GPU workers re-import the script", "Main guard around the script", "Guard every multi-process job"],
+              ["LoRA test showed nothing", "Old torchao broke adapter creation", "Upgraded torchao; checked adapter output equals merged weights", "Test the exact path you will serve"]],
+  lessons: ["The filter decides what the student can learn: dropping abstentions removed that skill."],
+  star: "I trained a small model three times on free GPUs and showed the runs agree."
+},
+{
+  id: "p10", tag: "P10", name: "Small model vs API", dates: "12 Nov 2026", verdict: ["fail", "G2, G3, G4 failed"],
+  scqa: ["The fine-tuned model cites well: 96% valid citations.", "It must also be truthful, decline when reviews are silent, fast and cheap.",
+         "Is it no worse than gpt-6-luna on grounding, speed and cost?", "No. It failed all three gates; the study instead found gpt-6-luna far better grounded than gpt-4o-mini and 33% cheaper."],
+  steps: [
+    ["AI assistant", "Answers", "300 test questions × 6 systems on identical reviews.", "Only the model differs.", "scripts/rag_eval_api_answers.py"],
+    ["Evaluation", "Two judges", "gpt-6.1-terra (strict) and Qwen3-8B (lenient), blind, one answer at a time.", "Opposite biases.", "scripts/rag_eval_judge_answers.py"],
+    ["Platform & CI", "Serving test", "vLLM on one T4: one and eight requests at a time; LoRA vs merged weights.", "Real latency and throughput.", "kaggle/bench/bench.py"],
+    ["App & UI", "Switch the app", "Review answers now gpt-6-luna, a citation per claim, cost and time per answer, free fallback.", "Act on the result.", "src/agent/review_answer.py"]
+  ],
+  decisions: [["Keep an API model; switch to gpt-6-luna", "009"], ["Answer model and prompt amended", "003"]],
+  results: [["G2 fine-tuning gain", "≥ +10 points, both judges", "+2.6 strict / +49.3 lenient", "no"],
+            ["G3 vs gpt-6-luna", "≥ −5 points; abstain ≥ 80%", "−74 / −18 points; abstains 0%", "no"],
+            ["G4 p95, one at a time", "≤ 3.0 s", "9.3 s", "no"],
+            ["G4 cost per 1,000", "≤ $0.178", "$0.571 at 50% GPU use", "no"],
+            ["gpt-6-luna vs gpt-4o-mini, grounded", "better under both judges", "+77 / +8 points", "ok"]],
+  obstacles: [["Judges disagree sharply", "The lenient judge ignores uncited claims", "Gates need both; person audit of 50 left open", "Audit a sample before trusting a judge"],
+              ["Paid judgements lost", "Script saved only at the end; session ended", "Save every 25; run detached", "Checkpoint any paid batch"]],
+  lessons: ["A failed candidate can still pay off: measuring the baseline found a better, cheaper model."],
+  star: "My fine-tuned model failed every gate, and the same test moved the app to a model that is better grounded and a third cheaper."
 }];
 
 const MAP = {
-  "Data (Inside Airbnb)": {p1: ["Clean + Parquet", "Features"]},
+  "Data (Inside Airbnb)": {p1: ["Clean + Parquet", "Features"], p8: ["Exact corpus"]},
   "Analytics": {p1: ["Charts", "K-Means areas", "Forecast on hold"], p3: ["Sentiment at scale"]},
-  "AI assistant": {p2: ["7-tool agent"], p4: ["Discovery", "Data merge"], p5: ["Review search"]},
-  "Evaluation": {p4: ["6-question check"], p5: ["Quality not measured"], p6: ["Cost + latency open"]},
-  "App & UI": {p2: ["Charts in chat"], p3: ["6 pages", "Maps"], p5: ["Translated sources"], p6: ["Results page"]},
-  "Platform & CI": {p6: ["CI + gated Pages"]},
-  "Decision": {p6: ["5 ADRs"]}
+  "AI assistant": {p2: ["7-tool agent"], p4: ["Discovery", "Data merge"], p5: ["Review search"], p8: ["5 search systems"], p9: ["Teacher", "LoRA x3"], p10: ["6 systems answered"]},
+  "Evaluation": {p4: ["6-question check"], p5: ["Quality not measured"], p6: ["Cost + latency open"], p7: ["Gates first"], p8: ["Blind labels", "G1 passed"], p9: ["Filter"], p10: ["Two judges", "G2–G4 failed"]},
+  "App & UI": {p2: ["Charts in chat"], p3: ["6 pages", "Maps"], p5: ["Translated sources"], p6: ["Results page"], p10: ["gpt-6-luna answers"]},
+  "Platform & CI": {p6: ["CI + gated Pages"], p7: ["Spend ledger"], p9: ["Kaggle T4s"], p10: ["vLLM serving test"]},
+  "Decision": {p6: ["5 ADRs"], p7: ["ADR-006, ADR-007"], p8: ["ADR-008"], p10: ["ADR-009"]}
 };
 
 const $ = (s, el = document) => el.querySelector(s);

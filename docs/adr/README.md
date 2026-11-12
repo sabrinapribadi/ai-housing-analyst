@@ -12,7 +12,7 @@ ADR-001 to ADR-005 were written retrospectively on 2026-11-11 from the code and 
 | [ADR-006](ADR-006-industry-alignment.md) | Industry alignment | Accepted | Questions follow Airbnb's six rated categories plus aspects hosts manage; Japan's 180-night Minpaku rules. |
 | [ADR-007](ADR-007-technology-assessment.md) | Technology assessment | Accepted | Adopt Qwen3-1.7B (student), Qwen3-8B (teacher), LoRA, vLLM on a free Kaggle T4; hold gated-licence models and paid GPU hosts. |
 | [ADR-008](ADR-008-retrieval-evaluation.md) | Retrieval evaluation | Accepted (G1 passed) | Reranked fusion lifts nDCG@10 from 0.459 to 0.545 (+0.087, interval +0.021 to +0.153); app keeps today's search until a CPU reranker is measured. |
-| [ADR-009](ADR-009-small-model-vs-api.md) | Small model vs API | Proposed (pre-registered) | LoRA Qwen3-1.7B vs gpt-6-luna; gates G2–G4 on grounding, cost and p95 latency. |
+| [ADR-009](ADR-009-small-model-vs-api.md) | Small model vs API | Accepted (G2–G4 failed) | LoRA Qwen3-1.7B on vLLM failed on grounding, abstention, latency and cost; app answers switch from gpt-4o-mini to gpt-6-luna (grounded +77 points strict, +8 lenient; 33% cheaper). |
 
 ## Decision Dependencies
 

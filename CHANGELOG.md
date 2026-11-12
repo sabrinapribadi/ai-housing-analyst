@@ -2,6 +2,18 @@
 
 Newest first. Each entry uses STAR (Situation, Task, Action, Result) so it can be told as a story.
 
+## [6.1.0] — 2026-11-12 — P8–P10 results: better search, small model fails, answers switch to gpt-6-luna
+**Files:** src/agent/review_answer.py (new), src/agent/rag_agent.py, src/ui/dashboard.py, docs/adr/ADR-003, ADR-008, ADR-009, docs/adr/README.md, docs/PRD.md (v7.1), docs/brief.yaml, README.md, data/outputs/rag_eval/, scripts/rag_eval_*.py, kaggle/, tests/test_rag_eval_questions.py
+- **Situation:** Review answers came from gpt-4o-mini with unmeasured grounding, cost and latency; the question was whether a fine-tuned small open model could replace the API.
+- **Task:** Run the pre-registered study (ADR-008, ADR-009) and act on its gates.
+- **Action:** Five retrieval systems on 120 labelled questions; Qwen3-8B teacher, LoRA on Qwen3-1.7B (3 seeds), vLLM benchmark on a Kaggle T4; 300 answers per system judged by two models from different families; paired bootstrap; spend ledger ($4.02 of $5).
+- **Result:**
+  - Reranked search lifts nDCG@10 0.459 → 0.545 (G1 passed); the app keeps today's search because the reranker needs a GPU.
+  - The fine-tuned model failed G2 (judges disagree), G3 (never abstains; −18 to −74 points vs gpt-6-luna) and G4 (p95 9.3 s; $0.57 vs $0.18 per 1,000).
+  - gpt-6-luna beats gpt-4o-mini under both judges (fully grounded +77 points strict, +8 lenient) and is 33% cheaper, so the app's review answers now use it with a citation after each claim; each answer shows tokens, time and cost, with a free fallback.
+  - Corrections: duplicate PRD "Module G" renamed H; PRD G.5 said the index sample was proportional, it is a simple random sample.
+- **Talking point:** "The fine-tuned model lost on every gate, and the study still paid off: it found a cheaper, far better grounded API model and a better search."
+
 ## [6.0.0] — 2026-11-11 — P7: pre-registered retrieval and small-model study
 **Files:** docs/adr/ADR-006 to ADR-009 (new), configs/rag_eval.yaml (new), docs/references.yaml, docs/PRD.md (v7.0), docs/adr/README.md, scripts/evidence.py, src/agent/rag_agent.py
 - **Situation:** Review search had never been measured, every answer needed an API key, and the app had no cost or latency figures (R13).

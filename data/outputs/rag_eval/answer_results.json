@@ -1,0 +1,213 @@
+{
+ "judges": {
+  "primary": {
+   "A1": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.7778,
+    "citation_validity": 0.9185,
+    "supported_sentence_rate": 0.9204,
+    "answers_question_rate": 0.963,
+    "abstained_answerable": 0.0704,
+    "abstention_out_of_scope": 0.9667
+   },
+   "A0": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.0111,
+    "citation_validity": 0.8889,
+    "supported_sentence_rate": 0.4731,
+    "answers_question_rate": 0.9111,
+    "abstained_answerable": 0.0889,
+    "abstention_out_of_scope": 1.0
+   },
+   "S0": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.0074,
+    "citation_validity": 0.7074,
+    "supported_sentence_rate": 0.2359,
+    "answers_question_rate": 0.6778,
+    "abstained_answerable": 0.237,
+    "abstention_out_of_scope": 0.5333
+   },
+   "S1_seed0": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.0333,
+    "citation_validity": 0.9593,
+    "supported_sentence_rate": 0.4741,
+    "answers_question_rate": 0.8963,
+    "abstained_answerable": 0.0037,
+    "abstention_out_of_scope": 0.0
+   },
+   "S1_seed1": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.0185,
+    "citation_validity": 0.9481,
+    "supported_sentence_rate": 0.4305,
+    "answers_question_rate": 0.8444,
+    "abstained_answerable": 0.0148,
+    "abstention_out_of_scope": 0.0
+   },
+   "S1_seed2": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.0407,
+    "citation_validity": 0.9519,
+    "supported_sentence_rate": 0.4461,
+    "answers_question_rate": 0.8667,
+    "abstained_answerable": 0.0111,
+    "abstention_out_of_scope": 0.0
+   }
+  },
+  "cross": {
+   "A1": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.9037,
+    "citation_validity": 0.9185,
+    "supported_sentence_rate": 0.9932,
+    "answers_question_rate": 0.9963,
+    "abstained_answerable": 0.0704,
+    "abstention_out_of_scope": 0.9667
+   },
+   "A0": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.8259,
+    "citation_validity": 0.8889,
+    "supported_sentence_rate": 0.9793,
+    "answers_question_rate": 1.0,
+    "abstained_answerable": 0.0889,
+    "abstention_out_of_scope": 1.0
+   },
+   "S0": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.2296,
+    "citation_validity": 0.7074,
+    "supported_sentence_rate": 0.8017,
+    "answers_question_rate": 0.9741,
+    "abstained_answerable": 0.237,
+    "abstention_out_of_scope": 0.5333
+   },
+   "S1_seed0": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.7222,
+    "citation_validity": 0.9593,
+    "supported_sentence_rate": 0.9294,
+    "answers_question_rate": 1.0,
+    "abstained_answerable": 0.0037,
+    "abstention_out_of_scope": 0.0
+   },
+   "S1_seed1": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.7,
+    "citation_validity": 0.9481,
+    "supported_sentence_rate": 0.9239,
+    "answers_question_rate": 1.0,
+    "abstained_answerable": 0.0148,
+    "abstention_out_of_scope": 0.0
+   },
+   "S1_seed2": {
+    "n_answerable": 270,
+    "judged": 270,
+    "grounded_answer_rate": 0.7148,
+    "citation_validity": 0.9519,
+    "supported_sentence_rate": 0.9276,
+    "answers_question_rate": 0.9963,
+    "abstained_answerable": 0.0111,
+    "abstention_out_of_scope": 0.0
+   }
+  }
+ },
+ "gates": {
+  "G2": {
+   "by_judge": {
+    "primary": {
+     "mean_gain": 0.025925925925925925,
+     "ci_low": 0.003703703703703704,
+     "ci_high": 0.05185185185185185,
+     "n_queries": 270,
+     "pass": false
+    },
+    "cross": {
+     "mean_gain": 0.4925925925925926,
+     "ci_low": 0.42592592592592593,
+     "ci_high": 0.5592592592592592,
+     "n_queries": 270,
+     "pass": true
+    }
+   },
+   "pass": false
+  },
+  "G3": {
+   "by_judge": {
+    "primary": {
+     "mean_gain": -0.7444444444444445,
+     "ci_low": -0.8,
+     "ci_high": -0.6851851851851852,
+     "n_queries": 270,
+     "pass": false
+    },
+    "cross": {
+     "mean_gain": -0.1814814814814815,
+     "ci_low": -0.24074074074074073,
+     "ci_high": -0.12222222222222222,
+     "n_queries": 270,
+     "pass": false
+    }
+   },
+   "pass": false
+  },
+  "G4": {
+   "A1": {
+    "cost_per_1000": 0.1783,
+    "p50_s": 2.757,
+    "p95_s": 4.504,
+    "measured_from": "development Mac over the internet, one call at a time"
+   },
+   "S1_seed0": {
+    "p95_s_c1": 9.316,
+    "p50_s_c1": 6.568,
+    "p95_s_c8": 24.258,
+    "answers_per_s_c8": 0.512,
+    "cost_per_1000_by_utilisation": {
+     "0.5": 0.5707,
+     "0.1": 2.8537,
+     "1.0": 0.2854
+    }
+   },
+   "S1_merged": {
+    "p95_s_c1": 3.939,
+    "p50_s_c1": 2.867,
+    "p95_s_c8": 14.825,
+    "answers_per_s_c8": 0.822,
+    "cost_per_1000_by_utilisation": {
+     "0.5": 0.3555,
+     "0.1": 1.7775,
+     "1.0": 0.1778
+    }
+   },
+   "S0": {
+    "p95_s_c1": 3.89,
+    "p50_s_c1": 2.496,
+    "p95_s_c8": 16.074,
+    "answers_per_s_c8": 0.946,
+    "cost_per_1000_by_utilisation": {
+     "0.5": 0.3089,
+     "0.1": 1.5445,
+     "1.0": 0.1545
+    }
+   },
+   "pass": false,
+   "break_even_utilisation_vs_A1": 1.6002
+  }
+ },
+ "decision": "keep the API model; S1 documented as the offline / no-key option",
+ "openai_spend_usd": 4.0173
+}

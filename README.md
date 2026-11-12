@@ -11,14 +11,16 @@
 4. **Where:** [Results page](https://sabrinapribadi.github.io/ai-housing-analyst/) and [technical walkthrough](https://sabrinapribadi.github.io/ai-housing-analyst/build.html) on GitHub Pages.
    - The Streamlit app runs locally with an OpenAI key.
 5. **When it fails:** A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run.
-   - No live A/B test: there are no users. Clustering has unit tests; CI runs them on every push.
-6. **How:** LangChain agent with 7 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); TextBlob sentiment; K-Means areas.
+   - Pre-registered study on 300 questions: a reranked review search lifts nDCG@10 from 0.46 to 0.55 (passed); a LoRA-tuned Qwen3-1.7B on vLLM failed all three gates against gpt-6-luna.
+   - No live A/B test: there are no users. Offline paired comparisons, two judges from different model families, and unit tests in CI replace it.
+6. **How:** LangChain agent with 7 tools over the listings; review answers by gpt-6-luna with a citation after each claim, chosen over gpt-4o-mini (fully grounded 78% vs 1%, 33% cheaper) and a fine-tuned small model; K-Means areas.
 
 **Skills applied** (each linked to the file or decision that shows it):
 
 - **GenAI and agents:** tool-using LangChain agent, retrieval over reviews, AI-guided data merge — [agent.py](src/agent/agent.py), [rag_agent.py](src/agent/rag_agent.py), [discovery_agent.py](src/agent/discovery_agent.py)
 - **Analytics and ML:** EDA, K-Means geospatial clusters, review sentiment — [eda.py](src/analytics/eda.py), [clustering.py](src/analytics/clustering.py)
-- **Evaluation:** hallucination test suite with a written checklist — [test_hallucination.py](tests/test_hallucination.py), [checklist](tests/hallucination_checklist.md)
+- **Evaluation:** retrieval nDCG with blind model-graded labels, two-judge grounding checks, paired bootstrap, pre-registered gates — [ADR-008](docs/adr/ADR-008-retrieval-evaluation.md), [ADR-009](docs/adr/ADR-009-small-model-vs-api.md), [test_hallucination.py](tests/test_hallucination.py)
+- **Fine-tuning and serving:** LoRA on Qwen3-1.7B from open-teacher answers (PEFT, TRL), vLLM serving benchmark, cost per 1,000 answers — [train_lora.py](kaggle/lora/train_lora.py), [bench.py](kaggle/bench/bench.py), [review_answer.py](src/agent/review_answer.py)
 - **CI:** GitHub Actions lint, unit and browser tests; Pages deploy only after they pass — [ci.yml](.github/workflows/ci.yml)
 
 <!-- brief:end -->
@@ -28,7 +30,7 @@
 | Page | What it does |
 |------|-------------|
 | **Dashboard** | Key market metrics, annotated price histogram, neighbourhood treemap, price vs rating scatter, box plot, rule-based price predictor |
-| **AI Assistant** | Two tabs: **Chat with Agent** — natural language Q&A via LangChain + GPT-4o-mini (7 tools, inline charts); **Ask the Reviews (RAG)** — semantic search over 25,000 embedded reviews via ChromaDB + OpenAI text-embedding-3-small, answers grounded in retrieved guest review text; quick-question presets auto-trigger search; source reviews auto-translated to English |
+| **AI Assistant** | Two tabs: **Chat with Agent** — natural language Q&A via LangChain + GPT-4o-mini (7 tools, inline charts); **Ask the Reviews (RAG)** — semantic search over 25,000 embedded reviews via ChromaDB + OpenAI text-embedding-3-small; answers by gpt-6-luna with a review id cited after each claim, plus tokens, time and cost per answer (ADR-009); quick-question presets auto-trigger search; source reviews auto-translated to English |
 | **Maps** | Choropleth by avg price with hover tooltips, listing density heatmap, MarkerCluster with rich popups — dark tile base with a layer guide panel |
 | **Sentiment Analysis** | TextBlob scoring on up to 100,000 reviews per filter (cached); Most Positive / Most Negative tabs filter by genuine label (> 0.1 / < −0.1); inline disclaimer explains translation artefacts and mixed-sentiment scoring |
 | **Data Explorer** | Column selector, configurable row count, smart number formatting (thousands separators, smart decimals), distribution viewer, data quality chart, neighbourhood comparison |
@@ -198,7 +200,7 @@ textColor                = "#F0F0F0"
 | Charts          | Plotly Express / Graph Objects                                            |
 | Maps            | Folium, streamlit-folium, folium.plugins (HeatMap, MarkerCluster)         |
 | Icons           | Streamlit Material icons (:material/\*), inline SVG for Folium popups     |
-| AI / Agent      | LangChain, LangGraph, OpenAI GPT-4o-mini                                  |
+| AI / Agent      | LangChain, LangGraph; OpenAI gpt-6-luna (review answers), GPT-4o-mini (agent) |
 | RAG             | ChromaDB (vector store), OpenAI text-embedding-3-small (256-dim)          |
 | ML              | scikit-learn (K-Means); Prophet code on hold (ADR-005)                    |
 | Data            | Pandas, NumPy, GeoPandas                                                  |

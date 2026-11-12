@@ -18,10 +18,11 @@ brief:
   - w: When it fails
     lines:
       - "A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run."
-      - "No live A/B test: there are no users. Clustering has unit tests; CI runs them on every push."
+      - "Pre-registered study on 300 questions: a reranked review search lifts nDCG@10 from 0.46 to 0.55 (passed); a LoRA-tuned Qwen3-1.7B on vLLM failed all three gates against gpt-6-luna."
+      - "No live A/B test: there are no users. Offline paired comparisons, two judges from different model families, and unit tests in CI replace it."
   - w: How
     lines:
-      - LangChain agent with 7 tools over the listings; retrieval over 25,000 embedded reviews (ChromaDB); TextBlob sentiment; K-Means areas.
+      - LangChain agent with 7 tools over the listings; review answers by gpt-6-luna with a citation after each claim, chosen over gpt-4o-mini (fully grounded 78% vs 1%, 33% cheaper) and a fine-tuned small model; K-Means areas.
 skills:
   - group: GenAI and agents
     what: tool-using LangChain agent, retrieval over reviews, AI-guided data merge
@@ -30,8 +31,11 @@ skills:
     what: EDA, K-Means geospatial clusters, review sentiment
     proof: [["eda.py", "src/analytics/eda.py"], ["clustering.py", "src/analytics/clustering.py"]]
   - group: Evaluation
-    what: hallucination test suite with a written checklist
-    proof: [["test_hallucination.py", "tests/test_hallucination.py"], ["checklist", "tests/hallucination_checklist.md"]]
+    what: retrieval nDCG with blind model-graded labels, two-judge grounding checks, paired bootstrap, pre-registered gates
+    proof: [["ADR-008", "docs/adr/ADR-008-retrieval-evaluation.md"], ["ADR-009", "docs/adr/ADR-009-small-model-vs-api.md"], ["test_hallucination.py", "tests/test_hallucination.py"]]
+  - group: Fine-tuning and serving
+    what: LoRA on Qwen3-1.7B from open-teacher answers (PEFT, TRL), vLLM serving benchmark, cost per 1,000 answers
+    proof: [["train_lora.py", "kaggle/lora/train_lora.py"], ["bench.py", "kaggle/bench/bench.py"], ["review_answer.py", "src/agent/review_answer.py"]]
   - group: CI
     what: GitHub Actions lint, unit and browser tests; Pages deploy only after they pass
     proof: [["ci.yml", ".github/workflows/ci.yml"]]

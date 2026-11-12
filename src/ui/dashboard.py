@@ -650,7 +650,8 @@ elif page == "AI Assistant":
             "retrieved via semantic vector search — not aggregated stats."
         )
         st.caption(
-            "Powered by OpenAI text-embedding-3-small (256-dim) + ChromaDB + GPT-4o-mini synthesis."
+            "Powered by OpenAI text-embedding-3-small (256-dim) + ChromaDB; answers by gpt-6-luna, "
+            "chosen in a 300-question test (ADR-009). Each claim cites the review it comes from."
         )
 
         rag_agent = load_rag_agent()
@@ -706,6 +707,10 @@ elif page == "AI Assistant":
 
                 st.markdown("### Answer")
                 st.markdown(result["answer"])
+                u = result.get("usage")
+                if u:
+                    st.caption(f"{u['model']} · {u['latency_s']:.1f} s · {u['tokens_in'] + u['tokens_out']:,} tokens · "
+                               f"${u['cost_usd'] * 1000:.3f} per 1,000 answers at this size")
 
                 if result["sources"]:
                     st.markdown("### Source Reviews")
@@ -716,6 +721,7 @@ elif page == "AI Assistant":
                     for src in result["sources"]:
                         translated, lang, was_translated = _translate(src["text"])
                         label = (
+                            f"[{src.get('id', '')}]{'  ·  cited' if src.get('cited') else ''}  ·  "
                             f"{src['neighbourhood']}  ·  similarity {src['similarity']:.2f}"
                             + (f"  ·  {lang.upper()}" if was_translated else "")
                         )

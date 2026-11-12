@@ -1,0 +1,88 @@
+{
+ "gpu": [
+  "Tesla",
+  "T4"
+ ],
+ "S0": {
+  "concurrency_1": {
+   "concurrency": 1,
+   "n": 300,
+   "wall_s": 671.74,
+   "answers_per_s": 0.447,
+   "p50_s": 2.496,
+   "p95_s": 3.89,
+   "tokens_out_mean": 84.1
+  },
+  "concurrency_8": {
+   "concurrency": 8,
+   "n": 300,
+   "wall_s": 317.03,
+   "answers_per_s": 0.946,
+   "p50_s": 9.531,
+   "p95_s": 16.074,
+   "tokens_out_mean": 84.7
+  }
+ },
+ "S1_seed0": {
+  "concurrency_1": {
+   "concurrency": 1,
+   "n": 300,
+   "wall_s": 1912.28,
+   "answers_per_s": 0.157,
+   "p50_s": 6.568,
+   "p95_s": 9.316,
+   "tokens_out_mean": 109.4
+  },
+  "concurrency_8": {
+   "concurrency": 8,
+   "n": 300,
+   "wall_s": 586.13,
+   "answers_per_s": 0.512,
+   "p50_s": 15.814,
+   "p95_s": 24.258,
+   "tokens_out_mean": 109.9
+  }
+ },
+ "S1_seed1": {
+  "concurrency_8": {
+   "concurrency": 8,
+   "n": 300,
+   "wall_s": 581.24,
+   "answers_per_s": 0.516,
+   "p50_s": 15.62,
+   "p95_s": 24.079,
+   "tokens_out_mean": 108.0
+  }
+ },
+ "S1_seed2": {
+  "concurrency_8": {
+   "concurrency": 8,
+   "n": 300,
+   "wall_s": 582.91,
+   "answers_per_s": 0.515,
+   "p50_s": 15.617,
+   "p95_s": 24.145,
+   "tokens_out_mean": 107.4
+  }
+ },
+ "S1_merged": {
+  "concurrency_1": {
+   "concurrency": 1,
+   "n": 300,
+   "wall_s": 841.62,
+   "answers_per_s": 0.356,
+   "p50_s": 2.867,
+   "p95_s": 3.939,
+   "tokens_out_mean": 109.8
+  },
+  "concurrency_8": {
+   "concurrency": 8,
+   "n": 300,
+   "wall_s": 364.99,
+   "answers_per_s": 0.822,
+   "p50_s": 9.954,
+   "p95_s": 14.825,
+   "tokens_out_mean": 109.8
+  }
+ }
+}
