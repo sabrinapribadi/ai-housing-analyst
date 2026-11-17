@@ -1,0 +1,639 @@
+{
+ "recorded_utc": "2026-11-17 17:50",
+ "model": "gpt-6-luna",
+ "source": "the committed review index (25,000 reviews)",
+ "runs": [
+  {
+   "question": "What do guests complain about most?",
+   "answer": "Guests most often complain about poor cleanliness, including dirty bathrooms, floors, bedding, towels, carpets, and leftover rubbish [rev_16423][rev_23212][rev_10081][rev_11727][rev_14208]. They also report inadequate supplies or amenities, such as too few towels or toilet paper, and equipment that did not work or was uncomfortable [rev_3911][rev_5618][rev_22875]. Other recurring complaints include confusing or ineffective communication and check-in instructions, plus noise or unpleasant odors [rev_20980][rev_14699][rev_3911][rev_14208][rev_23212].",
+   "images": [],
+   "tool_calls": [
+    {
+     "name": "search_reviews",
+     "arguments": {
+      "n_results": 10
+     },
+     "ok": true
+    },
+    {
+     "name": "cited_answer",
+     "arguments": {
+      "cited_reviews": 10
+     },
+     "ok": true
+    }
+   ],
+   "tool_results": [
+    {
+     "id": "rev_20980",
+     "neighbourhood": "Minato Ku",
+     "similarity": 0.602,
+     "cited": true,
+     "text": "实在太差了 毫无性价比 不满意的地方是以下这些。1.在我入住那天之前根本就没有告诉我房间具体的路线没有告诉我那边有门锁门锁的密码是多少，所以我是从后门一个人在狭窄的楼梯里把行李从一楼搬到四楼，然后看到了工作人员才告诉我在五楼，并且是有电梯的。这为什么不在我订房之后就跟我说呢？<br/>2. 很多事项，比如存放行李都会另外收费这些内容虽然在邮件里已经说了，但是我还是认为他是不合理的收费。我在入住之前当天存放行李和入住之后存放行李被总共收了两次费，但是在邮件中是按照每一件收费300的标准，而且根据我在床位边上的项目图上对比发现那边写的是200一件，我不知道这个价格为什么不统一，而且我都是同一件行李都只有一件，为什么要算我两次钱？<br/>3.分配的床位在卫生间旁边半夜的时候不仅透光，而且有人进进出出的声音很明显根本睡不着觉基本上5分钟就来一个人上厕所。<br/>4.标牌上写着休息室时间是早上8:00到晚上10:00，但是第二天check out之后因为外面在下雨，想去休息室坐一会儿，却被说因为已经退房了所以坐在那里要收费。我请问就这么一个凳子这么一张桌子让人休息一下，怎么了呢？还是说要连续入住才能做这么差的服务的房子还想愿意连续入住？"
+    },
+    {
+     "id": "rev_16423",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.576,
+     "cited": true,
+     "text": "主人回应及时，相关流程说明清晰；<br/>周边交通便捷，便利店或餐馆也齐全；<br/>但是卫生确实比较差：<br/>1）卧室床边间隙小，所以可能清洁人员就省略检查和打扫，有上家遗留下来的食物包装袋<br/>2）洗衣粉和卫生纸提供数量没有覆盖入住时间：4晚只有一包洗衣粉和一筒卷纸，希望负责人可以检查存量，至少紧急时刻客人有得备用。<br/>3）地毯不太干净，有点黏糊糊，建议可以撤掉，如果无法保持清洁的话，观感和体感会更好。"
+    },
+    {
+     "id": "rev_14699",
+     "neighbourhood": "Arakawa Ku",
+     "similarity": 0.561,
+     "cited": true,
+     "text": "Edward and Kaho greeted us upon arrival on August 10th and went over the rules of their house.  They were kind to receive delayed luggage the next day.<br/>We noted three very small bathroom towels and asked hosts to buy large white towels or we would do so.  Edward bought two large white towels.<br/>However, their communication was ineffective and unprofessional.  For example, I explained that on two occasions a taxi was not able to find the address because the English listing was incorrect.  Edward blamed Airbnb.  Shortly thereafter, Kaho explained it was her mistake and corrected it.  She w"
+    },
+    {
+     "id": "rev_3911",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.56,
+     "cited": true,
+     "text": "滞在には問題が多く、特に外国の方にはお勧めできない。<br/>その理由を7つの問題として記載しておきます。<br/>1つ目の問題：キーボックスの場所が指定されたところと異なるところにあり、見つけるまで非常に時間がかかった。寒い中、かなり嫌な気分になった<br/>2つ目の問題：キーボックスが全部で4つあったが、他のキーボックスのところに今回泊まった部屋のキーがポンと置いてあった。これはセキュリティ面で非常に不安を感じた<br/>3つ目の問題：事前にもらった資料ではポストの中に部屋の鍵がある、と記載されていたが、実際にはキーボックスの鍵で開けられたので、何のための説明だったのか疑問。これも無駄な時間となった<br/>4つ目の問題：鍵がカードタイプで開けづらく、かつ閉めづらい。また、それについての説明は事前資料になかった<br/>5つ目の問題：朝になってお湯が出なくなり、復旧までにかなりの時間をロスした。ホストからお湯を使いすぎたためでは？とのコメントがあったが、通常の使い方しかしていない。外国人の方だとおそらく復旧できないと思われるため、この宿には泊まらないほうがいい<br/>6つ目の問題：新品ではなく半分ぐらいのトイレットペーパーがあったが、三人で利用したため途中でなくなった。ストックがあるかと思いきや、ホストから自分で購入するようにコメントされたが、そんな対応をされたのは初めてで非"
+    },
+    {
+     "id": "rev_23212",
+     "neighbourhood": "Suginami Ku",
+     "similarity": 0.543,
+     "cited": true,
+     "text": "We picked Ever’s place because of the high rating review and location. Even thought we had satisfactory stay I thought I flag few things that bothered me as a Airbnb customer. <br/>Upon entering the place had a very distinctive smell. It was more noticeable upstairs until you turn the AC on and it seems to help. The kitchen is sparse. If you wanted to cook your meals it’s not that well maintained. The towels had musty smell. But what I found to be misleading was that pro quid pro. It had a big sign that said give 5 star review and you can have a late checkout. Which is why I think they got a h"
+    },
+    {
+     "id": "rev_22875",
+     "neighbourhood": "Katsushika Ku",
+     "similarity": 0.535,
+     "cited": true,
+     "text": "We recently stayed at this Airbnb for 8 nights, and overall, it was a decent experience. The apartment looked new and well-maintained, and most things worked perfectly. However, there were a couple of issues that remained unresolved despite our efforts to address them.<br/>TV Not Working: On the first day, we noticed that the TV wasn’t functioning. We promptly informed the host, who acknowledged the problem and promised to fix it. Unfortunately, even after several attempts, the issue persisted throughout our stay. It was disappointing not to have a working TV during our downtime.<br/>Thick Bla"
+    },
+    {
+     "id": "rev_14208",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.535,
+     "cited": true,
+     "text": "Stay away from this place they have BEDBUGS BADLY AND THE BEDS ARE OLD CREAKING AND NOISY. Lots of flys flying around in the shower, strong nasty odors and no reply or response from the host about bed bug bite complaint"
+    },
+    {
+     "id": "rev_5618",
+     "neighbourhood": "Minato Ku",
+     "similarity": 0.533,
+     "cited": true,
+     "text": "Positives<br/>- 5 min walk to two metro stations<br/>- 2 min walk to 7eleven<br/>- very close to Tokyo Tower<br/>- quiet street<br/>- host is very responsive, evenings included<br/>Negatives <br/>-WiFi slow or stopped working throughout our stay, had to use our limited data to plan days out/plan itineraries.<br/>- bedding not comfortable, both my partner and I ended up with sore backs and necks during our stay, one pillow each and they were incredibly thin (could feel the mattress under your head).<br/>- threats of fines plastered throughout the flat, did not make it feel homely and leaves you"
+    },
+    {
+     "id": "rev_10081",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.533,
+     "cited": true,
+     "text": "这次入住的房间太小了，主要卫生堪忧<br/>1.上一个客户留下的垃圾很恶心留在厨房柜里面<br/>2.枕头床单被套没有换过，而且这个房间很潮湿<br/>3.厕所浴缸的水位太低又小，泡澡根本泡不到全身<br/>4.马桶太老旧，垃圾桶也没有<br/>5.微波炉很恶心，玻璃上有很多污渍<br/>6.感觉浴巾不干净<br/>7.空调感觉很脏，吹的我晚上喉咙很痛<br/>8.窗外很近就是一排垃圾桶…最后一天有人在窗户外面踩瓶子理垃圾，隐隐约约有味道<br/>不推荐不推荐，不能因为便宜选择找个住处，导致我们每天都不想回来，一回来整个床都是潮湿的很恶心"
+    },
+    {
+     "id": "rev_11727",
+     "neighbourhood": "Minato Ku",
+     "similarity": 0.531,
+     "cited": true,
+     "text": "On arrival, the place was not clean. The worst was the filthy toilet and the floor around it. Add to that the hair and dustballs everywhere. The rest I won’t even mention. It took me more than hour to clean things up and I had to purchase my own cleaning products as absolutely nothing was supplied. I was going to drop the issue except that the host asked for feedback one week in. I advised of the lack of cleanliness and received what seemed like an impersonal AI generated response. I responded back to it and pointed out the lack or willingness to take accountability for what happened to which "
+    }
+   ],
+   "steps": 1,
+   "model": "gpt-6-luna",
+   "grounded": true,
+   "ungrounded_numbers": [],
+   "tokens": {
+    "input": 2532,
+    "cached_input": 0,
+    "output": 139
+   },
+   "cost_usd": 0.00032270000000000004,
+   "latency_ms": 9469.0
+  },
+  {
+   "question": "What do guests love about staying in Tokyo?",
+   "answer": "Guests love Tokyo’s convenient transport, with many stays close to train or metro stations and easy access to attractions [rev_11710][rev_7067][rev_14169][rev_3287]. They also praise clean, comfortable homes that feel welcoming and well equipped, including options spacious enough for families and groups [rev_14039][rev_21660][rev_14169][rev_17462]. Nearby shops, restaurants, and other conveniences make daily life easy, while some guests especially enjoy peaceful surroundings and rooftop views [rev_11710][rev_11584][rev_7067][rev_14169]. Guests also appreciate friendly, helpful hosts [rev_14039][rev_7067][rev_14169].",
+   "images": [],
+   "tool_calls": [
+    {
+     "name": "search_reviews",
+     "arguments": {
+      "n_results": 10
+     },
+     "ok": true
+    },
+    {
+     "name": "cited_answer",
+     "arguments": {
+      "cited_reviews": 8
+     },
+     "ok": true
+    }
+   ],
+   "tool_results": [
+    {
+     "id": "rev_11710",
+     "neighbourhood": "Katsushika Ku",
+     "similarity": 0.7,
+     "cited": true,
+     "text": "This is a very cozy and comfortable neighborhood — safe, peaceful, and pleasant at any time of day. There are plenty of shops, convenience stores, restaurants open until late, and pharmacies nearby. The area around the house is clean and quiet, and the nearest station is just a short walk away, making it easy to reach any part of Tokyo.<br/>The hosts were incredibly kind and thoughtful. They provided detailed instructions for both check-in and using the appliances, which made everything easy. The house has everything you need for a comfortable stay. Just a small tip: if you plan to cook, bring"
+    },
+    {
+     "id": "rev_11584",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.695,
+     "cited": true,
+     "text": "家人都很喜歡這裡，乾淨舒適，周遭有步行距離即可到達的便利商店、晴空塔、超市等，非常方便。出外活動時，小孩就會吵著要回到這裡，說是東京的家！希望很快有機會再回來入住！"
+    },
+    {
+     "id": "rev_14039",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.694,
+     "cited": true,
+     "text": "My family of six are visiting Tokyo. Living here feels very clean and very comfortable. Convenient transportation. And the host is very friendly."
+    },
+    {
+     "id": "rev_21456",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.694,
+     "cited": false,
+     "text": "great place to stay & see Tokyo."
+    },
+    {
+     "id": "rev_21660",
+     "neighbourhood": "Minato Ku",
+     "similarity": 0.692,
+     "cited": true,
+     "text": "We stayed at this place for a week and loved the facilities. The entire building was clean and the rooms are well thought out. The place feels like home and very welcoming. We loved every aspect of it like location is close to train station, places nearby to visit, restaurants nearby. We would book this place once again during our next trip. I would recommend this to anyone visiting or wanting to do a staycation in Tokyo."
+    },
+    {
+     "id": "rev_7067",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.692,
+     "cited": true,
+     "text": "The host was incredibly friendly and went above and beyond to be helpful with everything we needed. <br/>The location is absolutely strategic, especially for exploring Tokyo. Being so close to the station made getting around incredibly easy and saved us so much time. <br/>The house room itself was wonderfully comfortable and spotlessly clean. We particularly appreciated the peaceful and quiet atmosphere, which allowed for a great night's sleep.<br/>We definitely plan on staying here again on our next visit to Tokyo."
+    },
+    {
+     "id": "rev_14169",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.691,
+     "cited": true,
+     "text": "I can't thank the host enough.<br/>Correspondence was quick and effective all the time and they went out of their way to help us.  One example, they arranged transport to and from Shinjuku station for our large group (one being in a wheelchair).  They were able to accommodate late checkout.<br/>The accommodation is spacious, spotlessly clean and tidy.  Enough toilets and showers to accommodate us all (3 families in a group of 13).  If you plan on staying for a period of time, there is a washing machine and dryer which is extremely beneficial.  <br/>This accommodation is really easy to get to, "
+    },
+    {
+     "id": "rev_3287",
+     "neighbourhood": "Taito Ku",
+     "similarity": 0.686,
+     "cited": true,
+     "text": "This is an excellent location in Tokyo that is close to many great attractions.  I highly recommend staying here.  The apartment was very clean, comfortable, and well maintained.  We had a party of 7 people and felt right at home.  The host is very responsive."
+    },
+    {
+     "id": "rev_17462",
+     "neighbourhood": "Koto Ku",
+     "similarity": 0.682,
+     "cited": true,
+     "text": "主动热情，沟通顺畅，<br/>房子很大，设施很齐备，卫生干净，<br/>离地铁站也比较近，周边比较安静，<br/>是来东京旅游的很不错的选择。"
+    },
+    {
+     "id": "rev_19320",
+     "neighbourhood": "Bunkyo Ku",
+     "similarity": 0.681,
+     "cited": false,
+     "text": "Great place to stay with your families or friends in Tokyo."
+    }
+   ],
+   "steps": 1,
+   "model": "gpt-6-luna",
+   "grounded": true,
+   "ungrounded_numbers": [],
+   "tokens": {
+    "input": 1035,
+    "cached_input": 0,
+    "output": 156
+   },
+   "cost_usd": 0.0001815,
+   "latency_ms": 6257.9
+  },
+  {
+   "question": "What are common issues with cleanliness?",
+   "answer": "Guests commonly reported dusty or poorly cleaned surfaces and floors, including hair, dustballs, and grime left from previous stays [rev_13989][rev_11727][rev_11735][rev_17840]. Bathrooms and toilets were a recurring concern, with reports of a filthy toilet, unpleasant odors, and poor bathroom hygiene [rev_11727][rev_5810][rev_24546]. Other complaints included stained or musty bedding, dirty carpets and trash bins, mold in the refrigerator seal, and an unpleasant microwave [rev_16423][rev_13989][rev_24546].",
+   "images": [],
+   "tool_calls": [
+    {
+     "name": "search_reviews",
+     "arguments": {
+      "n_results": 10
+     },
+     "ok": true
+    },
+    {
+     "name": "cited_answer",
+     "arguments": {
+      "cited_reviews": 7
+     },
+     "ok": true
+    }
+   ],
+   "tool_results": [
+    {
+     "id": "rev_16423",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.568,
+     "cited": true,
+     "text": "主人回应及时，相关流程说明清晰；<br/>周边交通便捷，便利店或餐馆也齐全；<br/>但是卫生确实比较差：<br/>1）卧室床边间隙小，所以可能清洁人员就省略检查和打扫，有上家遗留下来的食物包装袋<br/>2）洗衣粉和卫生纸提供数量没有覆盖入住时间：4晚只有一包洗衣粉和一筒卷纸，希望负责人可以检查存量，至少紧急时刻客人有得备用。<br/>3）地毯不太干净，有点黏糊糊，建议可以撤掉，如果无法保持清洁的话，观感和体感会更好。"
+    },
+    {
+     "id": "rev_6529",
+     "neighbourhood": "Katsushika Ku",
+     "similarity": 0.546,
+     "cited": false,
+     "text": "1、房间年久失修，保守估计有50年历史，油污比较重，有严重的发霉味道。2、鞋柜脏污，歪斜，用垃圾当地角。3、床头柜、床、衣柜为山寨产品，有很严重的甲醛味道，早起头痛。4、衣柜里有很多垃圾没有及时清理，脏乱差严重。5、床单被罩褶皱严重，未执行一客一换选择，传单被罩颜色奇怪，不是白色的。6、未提供一次性拖鞋、纸杯、牙膏牙刷、梳子、饮用水等，有传染病风险。请朋友谨慎选择，请卫生部门介入处理。"
+    },
+    {
+     "id": "rev_8390",
+     "neighbourhood": "Toshima Ku",
+     "similarity": 0.48,
+     "cited": false,
+     "text": "1泊2日でお世話になりました。<br/>2点気になりました。<br/>1)清掃面:窓の開閉で、埃が舞ってしまいました。<br/>2)備品面:洗濯洗剤、消毒用アルコール、キッチンペーパーなど、衛生面の消耗品に関して、無いものが多く、洗濯機やキッチンはあるのに、使用しづらい環境でした。"
+    },
+    {
+     "id": "rev_5810",
+     "neighbourhood": "Chiyoda Ku",
+     "similarity": 0.479,
+     "cited": true,
+     "text": "The location is great and the story is engaging, but cleanliness is crucial! They really need to improve the hygiene, especially regarding the bathrooms."
+    },
+    {
+     "id": "rev_17840",
+     "neighbourhood": "Minato Ku",
+     "similarity": 0.478,
+     "cited": true,
+     "text": "It’s good, but noticed alot of things that needed to be cleaned/poorly cleaned."
+    },
+    {
+     "id": "rev_13989",
+     "neighbourhood": "Nakano Ku",
+     "similarity": 0.465,
+     "cited": true,
+     "text": "The host was responsive and always replied to messages. The location was great—easy access to transport, nice restaurants nearby, and station close by. Apartment was spacious.<br/>However, cleanliness was a major issue. apartment was very dusty, with an eyelash stuck to the table from previous guests. The bathroom was clogged, making it hard to shower, and I was told to pay extra for cleaning. The bedsheets were stained, and the sofa bed’s extra mattress had hair and feathers on it. Above the AC, thick dust caused breathing issues. Basic essentials were lacking. We were given  used toilet roll"
+    },
+    {
+     "id": "rev_11727",
+     "neighbourhood": "Minato Ku",
+     "similarity": 0.455,
+     "cited": true,
+     "text": "On arrival, the place was not clean. The worst was the filthy toilet and the floor around it. Add to that the hair and dustballs everywhere. The rest I won’t even mention. It took me more than hour to clean things up and I had to purchase my own cleaning products as absolutely nothing was supplied. I was going to drop the issue except that the host asked for feedback one week in. I advised of the lack of cleanliness and received what seemed like an impersonal AI generated response. I responded back to it and pointed out the lack or willingness to take accountability for what happened to which "
+    },
+    {
+     "id": "rev_23033",
+     "neighbourhood": "Suginami Ku",
+     "similarity": 0.452,
+     "cited": false,
+     "text": "If you are over 6’ tall, you will hit your head on the doorway. The place is not well maintained with toilet paper holder and towel bars missing. Extra soaps and paper goods are everywhere. Mirrors are not in convenient places. The cleaning crew does minimal work and there are unneeded, broken appliances throughout the property"
+    },
+    {
+     "id": "rev_11735",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.446,
+     "cited": true,
+     "text": "Very appreciate about the environment of the house, but i think the only one that need to improve is the floor, it can be more clean."
+    },
+    {
+     "id": "rev_24546",
+     "neighbourhood": "Taito Ku",
+     "similarity": 0.439,
+     "cited": true,
+     "text": "溝通態度良好，反應後都會主動說要請清潔人員來，不過我們還是選擇自己打掃。總之房間不太行⋯注重乾淨度的要考慮。第一廁所的味道真的很像外面公廁的味道，不光是馬桶裡的問題，是整個也沒有洗廁所。第二枕頭有別人的油耗味，不是更換枕頭套就可以解決的那種，是裡面的枕心都有味道，棉被也是不香的味道。第三微波爐裡面真的是非常非常的臭，很濃的燒焦味，使用感受非常差，也覺得很髒不衛生。第四冰箱膠條發霉，冰在裡面的食物衛生堪憂。第五垃圾桶裡面也髒髒的。"
+    }
+   ],
+   "steps": 1,
+   "model": "gpt-6-luna",
+   "grounded": true,
+   "ungrounded_numbers": [],
+   "tokens": {
+    "input": 1417,
+    "cached_input": 0,
+    "output": 127
+   },
+   "cost_usd": 0.00020520000000000003,
+   "latency_ms": 3385.0
+  },
+  {
+   "question": "What do people say about the location and transport?",
+   "answer": "Guests generally describe the location as convenient, with easy access to public transport and nearby train stations for getting around Tokyo [rev_4746][rev_6620][rev_16981][rev_5050][rev_7681]. One guest noted that it is farther east, while another said it feels local and off the tourist radar but is still easy to reach from elsewhere [rev_5448][rev_9156].",
+   "images": [],
+   "tool_calls": [
+    {
+     "name": "search_reviews",
+     "arguments": {
+      "n_results": 10
+     },
+     "ok": true
+    },
+    {
+     "name": "cited_answer",
+     "arguments": {
+      "cited_reviews": 7
+     },
+     "ok": true
+    }
+   ],
+   "tool_results": [
+    {
+     "id": "rev_5448",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.581,
+     "cited": true,
+     "text": "Good to reach and nice location to get to everything even if it is in further east."
+    },
+    {
+     "id": "rev_4746",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.579,
+     "cited": true,
+     "text": "Nice place, easy to access public transport."
+    },
+    {
+     "id": "rev_6620",
+     "neighbourhood": "Taito Ku",
+     "similarity": 0.576,
+     "cited": true,
+     "text": "Great location and beautiful place. Very close to transportation. Would recommend to anyone and hope to stay again soon"
+    },
+    {
+     "id": "rev_20557",
+     "neighbourhood": "Bunkyo Ku",
+     "similarity": 0.574,
+     "cited": false,
+     "text": "Great place to stay and easy to get around with public transport"
+    },
+    {
+     "id": "rev_16981",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.572,
+     "cited": true,
+     "text": "Very nice location. It’s easy to access different modes of transportation."
+    },
+    {
+     "id": "rev_17799",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.565,
+     "cited": false,
+     "text": "This place is in a very convenient location! Overall, it's great. The transportation is easy and there are many food options nearby! We really enjoy it 🤗🤗"
+    },
+    {
+     "id": "rev_9156",
+     "neighbourhood": "Kita Ku",
+     "similarity": 0.561,
+     "cited": true,
+     "text": "Great location with a local vibe. Off the tourist radar but still easy to get to and from everywhere.  Very nice deal!"
+    },
+    {
+     "id": "rev_5050",
+     "neighbourhood": "Suginami Ku",
+     "similarity": 0.557,
+     "cited": true,
+     "text": "A beautiful surrounding location, conveniently close to the local train station, making it easy to travel to other areas."
+    },
+    {
+     "id": "rev_7681",
+     "neighbourhood": "Koto Ku",
+     "similarity": 0.553,
+     "cited": true,
+     "text": "Great place, convenient to get around, close train stations. Quiet environment and great views."
+    },
+    {
+     "id": "rev_13127",
+     "neighbourhood": "Chuo Ku",
+     "similarity": 0.553,
+     "cited": false,
+     "text": "Good location, convenience to get around"
+    }
+   ],
+   "steps": 1,
+   "model": "gpt-6-luna",
+   "grounded": true,
+   "ungrounded_numbers": [],
+   "tokens": {
+    "input": 378,
+    "cached_input": 0,
+    "output": 91
+   },
+   "cost_usd": 8.33e-05,
+   "latency_ms": 3341.5
+  },
+  {
+   "question": "What makes a highly rated listing?",
+   "answer": "Highly rated listings are often described as clean, comfortable, and well-equipped, with a convenient location near transit or other attractions. [rev_4768][rev_5026][rev_1724] Guests also value responsive, attentive hosts and a smooth check-in process with clear instructions. [rev_23616][rev_1724]",
+   "images": [],
+   "tool_calls": [
+    {
+     "name": "search_reviews",
+     "arguments": {
+      "n_results": 10
+     },
+     "ok": true
+    },
+    {
+     "name": "cited_answer",
+     "arguments": {
+      "cited_reviews": 4
+     },
+     "ok": true
+    }
+   ],
+   "tool_results": [
+    {
+     "id": "rev_4768",
+     "neighbourhood": "Shibuya Ku",
+     "similarity": 0.46,
+     "cited": true,
+     "text": "Great, clean place. Very responsive, helpful  host"
+    },
+    {
+     "id": "rev_5026",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.46,
+     "cited": true,
+     "text": "Excellent airbnb that was clean and spacious, great location, very responsive hosts"
+    },
+    {
+     "id": "rev_10866",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.458,
+     "cited": false,
+     "text": "Super helpful and responsive hosts!"
+    },
+    {
+     "id": "rev_2179",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.453,
+     "cited": false,
+     "text": "Goos location, responsive host, 100% recommended."
+    },
+    {
+     "id": "rev_23616",
+     "neighbourhood": "Shibuya Ku",
+     "similarity": 0.446,
+     "cited": true,
+     "text": "Great hosts who are quick to respond and address any issues. Seamless process and very amazing location."
+    },
+    {
+     "id": "rev_15669",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.444,
+     "cited": false,
+     "text": "A superstar rating in my experience in Airbnb. Quiet, clean, good location,considerate for everything."
+    },
+    {
+     "id": "rev_1214",
+     "neighbourhood": "Shibuya Ku",
+     "similarity": 0.444,
+     "cited": false,
+     "text": "Great place and very responsive"
+    },
+    {
+     "id": "rev_9632",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.442,
+     "cited": false,
+     "text": "Great place! Highly recommended!!"
+    },
+    {
+     "id": "rev_1724",
+     "neighbourhood": "Katsushika Ku",
+     "similarity": 0.437,
+     "cited": true,
+     "text": "This house is truly excellent. It's super clean, conveniently close to the station, and very comfortable. The property is well-equipped - we never found ourselves lacking anything we needed.<br/>The host is attentive and thoughtful, regularly checking in to ensure everything was satisfactory. The check-in process was extremely smooth, thanks to the detailed guide provided. This guide also includes a helpful list of nearby restaurants, which we found quite useful.<br/>The location, amenities, and hospitality all combined to make our stay exceptional. I would definitely choose this house again a"
+    },
+    {
+     "id": "rev_22797",
+     "neighbourhood": "Taito Ku",
+     "similarity": 0.435,
+     "cited": false,
+     "text": "Clean place and responsive host"
+    }
+   ],
+   "steps": 1,
+   "model": "gpt-6-luna",
+   "grounded": true,
+   "ungrounded_numbers": [],
+   "tokens": {
+    "input": 417,
+    "cached_input": 0,
+    "output": 73
+   },
+   "cost_usd": 7.82e-05,
+   "latency_ms": 2948.3
+  },
+  {
+   "question": "What do guests say about communication with hosts?",
+   "answer": "Guests generally describe communication with hosts as very good, saying they were responsive and replied quickly to questions or needs. [rev_12244][rev_14740][rev_9060] They also mention receiving timely information and advance communication to prepare for arrival. [rev_12244][rev_20372]",
+   "images": [],
+   "tool_calls": [
+    {
+     "name": "search_reviews",
+     "arguments": {
+      "n_results": 10
+     },
+     "ok": true
+    },
+    {
+     "name": "cited_answer",
+     "arguments": {
+      "cited_reviews": 4
+     },
+     "ok": true
+    }
+   ],
+   "tool_results": [
+    {
+     "id": "rev_2670",
+     "neighbourhood": "Shinagawa Ku",
+     "similarity": 0.634,
+     "cited": false,
+     "text": "Good service and communication from the host"
+    },
+    {
+     "id": "rev_12244",
+     "neighbourhood": "Setagaya Ku",
+     "similarity": 0.625,
+     "cited": true,
+     "text": "The hosts are very friendly and helpful. They share a lot of information in timely manner and they always reply quickly. Very responsible."
+    },
+    {
+     "id": "rev_12307",
+     "neighbourhood": "Taito Ku",
+     "similarity": 0.604,
+     "cited": false,
+     "text": "Very communicative and hospitable"
+    },
+    {
+     "id": "rev_17176",
+     "neighbourhood": "Shibuya Ku",
+     "similarity": 0.6,
+     "cited": false,
+     "text": "Great stay, hosts were very communicative and accommodating. Would definitely stay again."
+    },
+    {
+     "id": "rev_14740",
+     "neighbourhood": "Taito Ku",
+     "similarity": 0.582,
+     "cited": true,
+     "text": "Responsive host, I really appreciate their communication"
+    },
+    {
+     "id": "rev_20996",
+     "neighbourhood": "Sumida Ku",
+     "similarity": 0.582,
+     "cited": false,
+     "text": "Great room and good communication from staff"
+    },
+    {
+     "id": "rev_5661",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.58,
+     "cited": false,
+     "text": "Very communicative host, impressed by all the amenities in the place 💕"
+    },
+    {
+     "id": "rev_24124",
+     "neighbourhood": "Shibuya Ku",
+     "similarity": 0.573,
+     "cited": false,
+     "text": "Very nice stay. Great communication from host!"
+    },
+    {
+     "id": "rev_20372",
+     "neighbourhood": "Arakawa Ku",
+     "similarity": 0.569,
+     "cited": true,
+     "text": "The host is very friendly and hospitable, communicating with us ahead of time and ensuring everything was prepared for our arrival. The check-in and check-out process was seamless."
+    },
+    {
+     "id": "rev_9060",
+     "neighbourhood": "Shinjuku Ku",
+     "similarity": 0.566,
+     "cited": true,
+     "text": "Hosts were unbelievable responsive. Answering quickly with any question or need we had."
+    }
+   ],
+   "steps": 1,
+   "model": "gpt-6-luna",
+   "grounded": true,
+   "ungrounded_numbers": [],
+   "tokens": {
+    "input": 341,
+    "cached_input": 0,
+    "output": 67
+   },
+   "cost_usd": 6.759999999999999e-05,
+   "latency_ms": 2646.9
+  }
+ ],
+ "summary": {
+  "questions": 6,
+  "grounded": 6,
+  "cost_usd_total": 0.000939,
+  "cost_per_1000_usd": 0.1564,
+  "latency_ms_p50": 3385.0,
+  "latency_ms_p95": 9469.0
+ }
+}

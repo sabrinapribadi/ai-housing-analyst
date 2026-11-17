@@ -29,9 +29,13 @@ try:
 except ImportError:
     _TRANSLATION_AVAILABLE = False
 
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parent))      # shared chat engine and the app's own modules (R26)
+import aha_agents  # noqa: E402
+import chat  # noqa: E402
+import showcase  # noqa: E402
 from src.analytics.eda import EDAAnalyzer
 from src.analytics.clustering import GeospatialClusterer
-from src.agent.agent import AirbnbAgent
 
 try:
     from src.agent.discovery_agent import DataDiscoveryAgent, CATEGORY_COLOR
@@ -232,21 +236,6 @@ def _sentiment_for_listings(listing_ids: tuple) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache_resource
-def load_agent() -> AirbnbAgent:
-    return AirbnbAgent()
-
-
-@st.cache_resource
-def load_rag_agent():
-    try:
-        from src.agent.rag_agent import ReviewRAGAgent
-        agent = ReviewRAGAgent()
-        return agent if agent.is_index_built() else None
-    except Exception:
-        return None
-
-
 # ── Session state ──────────────────────────────────────────────────────────────
 if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
@@ -350,7 +339,9 @@ page = st.session_state.page
 # DASHBOARD
 # ═══════════════════════════════════════════════════════════════════════════════
 if page == "Dashboard":
-    st.title("Tokyo Airbnb Market")
+    import pyarrow.parquet as _pq
+    showcase.render(st, len(df), _pq.ParquetFile("data/processed/reviews_processed.parquet").metadata.num_rows)
+    st.subheader("Tokyo Airbnb Market")
     st.caption(f"Showing **{len(filtered_df):,}** of {len(df):,} listings")
 
     # ── KPIs ───────────────────────────────────────────────────────────────────
@@ -564,177 +555,18 @@ if page == "Dashboard":
 # ═══════════════════════════════════════════════════════════════════════════════
 elif page == "AI Assistant":
     st.title("AI Assistant")
-    st.caption("Ask questions about the Tokyo Airbnb market in plain English.")
-
-    if not os.getenv("OPENAI_API_KEY"):
-        st.error(
-            "**OpenAI API key not found.**\n\n"
-            "To enable the AI Assistant on Streamlit Cloud:\n"
-            "1. Click **Manage app** (bottom-right of this page)\n"
-            "2. Go to **Settings → Secrets**\n"
-            "3. Add the following and save:\n\n"
-            "```toml\n"
-            "OPENAI_API_KEY = \"sk-...\"\n"
-            "```\n\n"
-            "The app will automatically restart once the secret is saved."
-        )
-        st.stop()
-
-    agent = load_agent()
-
-    tab_chat, tab_rag = st.tabs(["Chat with Agent", "Ask the Reviews (RAG)"])
-
-    # ── Tab 1: existing LLM-with-tools chat ───────────────────────────────────
+    st.caption("Two agents: a data agent with tools over the listings, and cited answers from guest reviews. "
+               "Recorded answers by default; use your own OpenAI key to ask anything live.")
+    tab_chat, tab_rag = st.tabs(["Chat with the data agent", "Ask the reviews (RAG)"])
     with tab_chat:
-        PRESETS = [
-            "What's the average price in Tokyo?",
-            "Which neighbourhoods are most expensive?",
-            "What are the cheapest neighbourhoods?",
-            "Recommend neighbourhoods under ¥20,000",
-            "Show the price distribution by room type",
-            "What's the average review score?",
-        ]
-
-        st.markdown("**Quick questions**")
-        cols = st.columns(3)
-        preset_clicked = None
-        for i, q in enumerate(PRESETS):
-            if cols[i % 3].button(q, key=f"preset_{i}", use_container_width=True):
-                preset_clicked = q
-
-        st.markdown("---")
-
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-
-        for msg in st.session_state.messages:
-            with st.chat_message(msg["role"]):
-                st.markdown(msg["content"])
-                for plot_path in msg.get("plots", []):
-                    if os.path.exists(plot_path):
-                        st.image(plot_path, use_container_width=True)
-
-        user_input = st.chat_input("Ask a question...") or preset_clicked
-
-        if user_input:
-            st.session_state.messages.append({"role": "user", "content": user_input})
-            with st.chat_message("user"):
-                st.markdown(user_input)
-            with st.chat_message("assistant"):
-                with st.spinner("Thinking..."):
-                    call_time = time.time()
-                    response  = agent.ask(user_input)
-                st.markdown(response)
-
-                new_plots = sorted(
-                    [p for p in glob.glob("outputs/*.png")
-                     if os.path.getmtime(p) >= call_time - 1],
-                    key=os.path.getmtime,
-                )
-                for plot_path in new_plots:
-                    st.image(plot_path, use_container_width=True)
-
-            st.session_state.messages.append(
-                {"role": "assistant", "content": response, "plots": new_plots}
-            )
-
-        if st.session_state.messages:
-            if st.button("Clear conversation"):
-                st.session_state.messages = []
-                st.rerun()
-
-    # ── Tab 2: RAG — semantic review search ───────────────────────────────────
+        st.markdown("The agent picks tools (summary statistics, prices by neighbourhood or room type, review scores, recommendations, "
+                    "charts) and answers from their results; every number is checked against them.")
+        chat.render(st, _P(__file__).resolve().parent / "replays_data_agent.json", aha_agents.DataAgent, prefix="data_")
     with tab_rag:
-        st.markdown(
-            "Ask qualitative questions answered directly from **25,000 real guest reviews** "
-            "retrieved via semantic vector search — not aggregated stats."
-        )
-        st.caption(
-            "Powered by OpenAI text-embedding-3-small (256-dim) + ChromaDB; answers by gpt-6-luna, "
-            "chosen in a 300-question test (ADR-009). Each claim cites the review it comes from."
-        )
+        st.markdown("Answers come from guest reviews retrieved by meaning (text-embedding-3-small, ChromaDB) and written by gpt-6-luna "
+                    "with a citation after each claim; chosen over gpt-4o-mini in a 300-question test (fully grounded 78% vs 1%, ADR-009).")
+        chat.render(st, _P(__file__).resolve().parent / "replays_reviews.json", aha_agents.ReviewAgent, prefix="rag_")
 
-        rag_agent = load_rag_agent()
-
-        if rag_agent is None:
-            st.warning(
-                "**Review index not found.** "
-                "Run `python scripts/build_review_index.py` locally, then commit "
-                "the `data/chroma/` directory to enable this feature."
-            )
-        else:
-            st.caption(f"Index: {rag_agent.index_count():,} reviews embedded")
-
-            RAG_PRESETS = [
-                "What do guests complain about most?",
-                "What do guests love about staying in Tokyo?",
-                "What are common issues with cleanliness?",
-                "What do people say about the location and transport?",
-                "What makes a highly rated listing?",
-                "What do guests say about communication with hosts?",
-            ]
-
-            st.markdown("**Quick questions**")
-            rag_cols = st.columns(3)
-            for i, q in enumerate(RAG_PRESETS):
-                if rag_cols[i % 3].button(q, key=f"rag_preset_{i}", use_container_width=True):
-                    st.session_state["rag_question"] = q
-                    st.session_state["rag_run_search"] = True
-                    st.rerun()
-
-            st.markdown("---")
-
-            q_col, nb_col = st.columns([3, 1])
-            with q_col:
-                rag_q = st.text_input(
-                    "Question",
-                    placeholder="What do guests complain about in Shinjuku?",
-                    key="rag_question",
-                )
-            with nb_col:
-                nb_options = ["All neighbourhoods"] + sorted(
-                    df["neighbourhood_cleansed"].dropna().unique().tolist()
-                )
-                rag_nb = st.selectbox("Filter by neighbourhood", nb_options, key="rag_nb")
-
-            manual_search = st.button("Search Reviews", type="primary", key="rag_search")
-            auto_search   = st.session_state.pop("rag_run_search", False)
-
-            if (manual_search or auto_search) and rag_q:
-                nb_filter = "" if rag_nb == "All neighbourhoods" else rag_nb
-                with st.spinner("Searching 25,000 reviews…"):
-                    result = rag_agent.query(rag_q, neighbourhood=nb_filter, n_results=10)
-
-                st.markdown("### Answer")
-                st.markdown(result["answer"])
-                u = result.get("usage")
-                if u:
-                    st.caption(f"{u['model']} · {u['latency_s']:.1f} s · {u['tokens_in'] + u['tokens_out']:,} tokens · "
-                               f"${u['cost_usd'] * 1000:.3f} per 1,000 answers at this size")
-
-                if result["sources"]:
-                    st.markdown("### Source Reviews")
-                    st.caption(
-                        "Retrieved by semantic similarity. "
-                        "Non-English reviews are auto-translated — expand to see the original."
-                    )
-                    for src in result["sources"]:
-                        translated, lang, was_translated = _translate(src["text"])
-                        label = (
-                            f"[{src.get('id', '')}]{'  ·  cited' if src.get('cited') else ''}  ·  "
-                            f"{src['neighbourhood']}  ·  similarity {src['similarity']:.2f}"
-                            + (f"  ·  {lang.upper()}" if was_translated else "")
-                        )
-                        with st.expander(label):
-                            st.write(translated)
-                            if was_translated:
-                                with st.expander(f"Original · {lang.upper()}"):
-                                    st.write(src["text"])
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# MAPS
-# ═══════════════════════════════════════════════════════════════════════════════
 elif page == "Maps":
     from folium.plugins import HeatMap, MarkerCluster
 

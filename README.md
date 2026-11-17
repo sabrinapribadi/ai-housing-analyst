@@ -9,7 +9,7 @@
 3. **Who:** Users: hosts, investors and market analysts.
    - Data: Inside Airbnb Tokyo, 27,945 listings and 444,182 reviews.
 4. **Where:** [Results page](https://sabrinapribadi.github.io/ai-housing-analyst/) and [technical walkthrough](https://sabrinapribadi.github.io/ai-housing-analyst/build.html) on GitHub Pages.
-   - The Streamlit app runs locally with an OpenAI key.
+   - Streamlit app: recorded agent answers by default; a viewer can use their own OpenAI key to ask live.
 5. **When it fails:** A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run.
    - Pre-registered study on 300 questions: a reranked review search lifts nDCG@10 from 0.46 to 0.55 (passed); a LoRA-tuned Qwen3-1.7B on vLLM failed all three gates against gpt-6-luna.
    - No live A/B test: there are no users. Offline paired comparisons, two judges from different model families, and unit tests in CI replace it.
@@ -126,6 +126,18 @@ Run the pipeline once to build the processed Parquet files:
 ```bash
 python scripts/save_processed_data.py
 ```
+
+## Try it interactively (Streamlit app)
+
+Entry point `src/ui/dashboard.py` (rule R26); deploy on Streamlit Community Cloud from `main`, no secrets needed.
+
+1. **First screen:** headline results from committed files (search nDCG@10 0.545, was 0.459; fully grounded answers 78%, previous model 1%), the brief and links.
+2. **AI Assistant, replay by default:** 6 data-agent and 6 review answers recorded from the real agents (`src/ui/replays_*.json`, made by `scripts/record_app_replays.py`), each with its tool calls, charts, cited reviews, a number check (12 of 12 pass), cost and time.
+3. **Live with your own key:** a viewer can paste their own OpenAI key; it stays in their session only, is never stored or logged, and is capped at 10 questions. The app never holds a key of ours.
+4. **Dashboard, maps, data explorer, sentiment and data discovery** run on the committed Inside Airbnb data.
+
+- **Tests:** `tests/test_streamlit_app.py` (AppTest: first screen, both replay surfaces, live mode with a stub agent, replay integrity) runs in CI.
+- **Free-tier limits:** the app sleeps after 12 hours without visits; the [results page](https://sabrinapribadi.github.io/ai-housing-analyst/) is always on.
 
 ## Running the App
 

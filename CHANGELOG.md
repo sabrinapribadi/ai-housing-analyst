@@ -2,6 +2,14 @@
 
 Newest first. Each entry uses STAR (Situation, Task, Action, Result) so it can be told as a story.
 
+## [6.2.0] — 2026-11-18 — Streamlit app without a key: replay by default, the viewer's own key optional (R26)
+**Files:** src/ui/dashboard.py, src/ui/showcase.py (new), src/ui/aha_agents.py (new), src/ui/agent.py and src/ui/chat.py (new, shared with the other portfolio apps), src/ui/replays_data_agent.json, src/ui/replays_reviews.json, src/ui/replay_plots/ (new), src/agent/agent.py, scripts/record_app_replays.py (new), tests/test_streamlit_app.py (new), .github/workflows/ci.yml, docs/brief.yaml, README.md, docs/index.html
+- **Situation:** The app's AI Assistant stopped without the owner's OpenAI key in Streamlit secrets, against R26 (no keys), so it was never deployed.
+- **Task:** Make the app deployable at $0 with the agents still on show, and give it the portfolio's showcase first screen.
+- **Action:** Replay of 12 recorded runs (data agent and review search) with tools, charts, cited reviews, number check, cost and time; a bring-your-own-key live mode, session-only and capped; the data agent takes a viewer's key and returns its trace; a first screen with committed results and the brief; AppTest job in CI.
+- **Result:** 12 of 12 recorded answers pass the number check; about $0.29 per 1,000 data-agent questions and $0.16 per 1,000 review questions; recording cost $0.004 (study spend now about $4.02 of $5). Reading the answers found one real error the number check cannot see (the agent ranked neighbourhoods from general knowledge after a chart-only tool); its instructions now require names and figures from a tool result, and the re-recorded answer matches the data.
+- **Talking point:** "The live app shows the agents' real answers with their evidence, and anyone can rerun them on their own key; we pay nothing to host it."
+
 ## [6.1.0] — 2026-11-12 — P8–P10 results: better search, small model fails, answers switch to gpt-6-luna
 **Files:** src/agent/review_answer.py (new), src/agent/rag_agent.py, src/ui/dashboard.py, docs/adr/ADR-003, ADR-008, ADR-009, docs/adr/README.md, docs/PRD.md (v7.1), docs/brief.yaml, README.md, data/outputs/rag_eval/, scripts/rag_eval_*.py, kaggle/, tests/test_rag_eval_questions.py
 - **Situation:** Review answers came from gpt-4o-mini with unmeasured grounding, cost and latency; the question was whether a fine-tuned small open model could replace the API.

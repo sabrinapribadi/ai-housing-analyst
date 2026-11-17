@@ -14,7 +14,7 @@ brief:
   - w: Where
     lines:
       - "[Results page](https://sabrinapribadi.github.io/ai-housing-analyst/) and [technical walkthrough](https://sabrinapribadi.github.io/ai-housing-analyst/build.html) on GitHub Pages."
-      - The Streamlit app runs locally with an OpenAI key.
+      - "Streamlit app: recorded agent answers by default; a viewer can use their own OpenAI key to ask live."
   - w: When it fails
     lines:
       - "A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run."
