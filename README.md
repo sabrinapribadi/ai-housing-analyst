@@ -131,12 +131,14 @@ python scripts/save_processed_data.py
 
 **Live:** [ai-housing-analyst on Streamlit](https://ai-housing-analyst-gvtqlzoundrzjefemb4bbf.streamlit.app/). Entry point `src/ui/dashboard.py` (rule R26), deployed on Streamlit Community Cloud from `main` with no secrets.
 
-1. **First screen:** headline results from committed files (search nDCG@10 0.545, was 0.459; fully grounded answers 78%, previous model 1%), the brief and links.
-2. **AI Assistant, replay by default:** 6 data-agent and 6 review answers recorded from the real agents (`src/ui/replays_*.json`, made by `scripts/record_app_replays.py`), each with its tool calls, charts, cited reviews, a number check (12 of 12 pass), cost and time.
-3. **Live with your own key:** a viewer can paste their own OpenAI key; it stays in their session only, is never stored or logged, and is capped at 10 questions. The app never holds a key of ours.
-4. **Dashboard, maps, data explorer, sentiment and data discovery** run on the committed Inside Airbnb data.
+Built on the portfolio's app template (rule R26 item 8): a sidebar with one button per page (each page linkable as `?page=`), at-a-glance stats and links; every page opens with the business question it answers, with the answer computed from the data.
 
-- **Tests:** `tests/test_streamlit_app.py` (AppTest: first screen, both replay surfaces, live mode with a stub agent, replay integrity) runs in CI.
+1. **Overview:** headline results from committed files (search nDCG@10 0.545, was 0.459; fully grounded answers 78%, previous model 1%), the 5W1H brief and a card per page.
+2. **Explore the market, Maps, Data explorer, Guest sentiment, Data discovery:** the committed Inside Airbnb data, filtered in the sidebar; maps on Esri's dark gray base map (no key needed).
+3. **AI Assistant, replay by default:** 6 data-agent and 6 review answers recorded from the real agents (`src/ui/replays_*.json`, made by `scripts/record_app_replays.py`), each with its tool calls, charts, cited reviews, a number check (12 of 12 pass), cost and time.
+4. **Live with your own key:** a viewer can paste their own OpenAI key; it stays in their session only, is never stored or logged, and is capped at 10 questions. The app drops any `OPENAI_API_KEY` at start, so it never runs on a key of ours (data discovery writes its findings from templates).
+
+- **Tests:** `tests/test_streamlit_app.py` (AppTest: first screen and brief, every page and its business question, both replay surfaces, live mode with a stub agent, the owner key dropped, replay integrity) runs in CI.
 - **Free-tier limits:** the app sleeps after 12 hours without visits; the [results page](https://sabrinapribadi.github.io/ai-housing-analyst/) is always on.
 
 ## Running the App

@@ -3,6 +3,8 @@ Streamlit Dashboard for Airbnb Tokyo Analytics
 """
 
 import os
+
+os.environ.pop("OPENAI_API_KEY", None)   # R26: never the owner's key; a viewer's own key is passed explicitly
 import re
 import sys
 import glob
@@ -108,7 +110,7 @@ def _translate(text: str) -> tuple[str, str, bool]:
 # ── CSS ────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-  .block-container { padding-top: 1.5rem; padding-bottom: 2rem; }
+  .block-container { padding-top: 3.2rem; padding-bottom: 2rem; }
 
   /* ── Metric cards ───────────────────────────────────────────────────── */
   [data-testid="stMetric"] {
@@ -236,10 +238,6 @@ def _sentiment_for_listings(listing_ids: tuple) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-# ── Session state ──────────────────────────────────────────────────────────────
-if "page" not in st.session_state:
-    st.session_state.page = "Dashboard"
-
 # ── Load data (auto-process on first run) ─────────────────────────────────────
 from pathlib import Path as _Path
 if not _Path("data/processed/listings_processed.parquet").exists():
@@ -261,33 +259,30 @@ eda = EDAAnalyzer(df)
 clusterer = GeospatialClusterer(df)
 
 
-# ── Sidebar ────────────────────────────────────────────────────────────────────
+# ── Pages and sidebar (shared app frame, R26: brand, pages, at-a-glance stats, filters, links) ─────────────
+import frame as F  # noqa: E402  shared app frame (identical in every portfolio app)
+
+F.setup(st, accent="#ff8a8d")
+PAGES = [
+    F.Page("overview", "Overview", ":material/home:", "The results, the brief and where to start."),
+    F.Page("explore", "Explore the market", ":material/query_stats:",
+           "Prices, room types, neighbourhoods and review scores for the listings in the sidebar filters."),
+    F.Page("maps", "Maps", ":material/map:", "Where listings are, where prices are high and how areas cluster, on interactive maps."),
+    F.Page("data", "Data explorer", ":material/table_chart:",
+           "Browse and filter listings, see each column's distribution and missing values, and compare neighbourhoods."),
+    F.Page("sentiment", "Guest sentiment", ":material/reviews:",
+           "What guests feel, scored from their reviews for the listings in view, with the most positive and negative examples."),
+    F.Page("discovery", "Data discovery", ":material/manage_search:",
+           "An automatic scan for price outliers, hidden gems, market gaps and correlations, and a merge with your own dataset."),
+    F.Page("agent", "AI Assistant", ":material/smart_toy:",
+           "Ask the data agent or the reviews in plain words: recorded answers replay for free; your own OpenAI key runs them live."),
+]
+page = F.navigate(st, PAGES, brand="AI Housing Analyst", tagline="Tokyo Airbnb: prices, places, sentiment", icon="⌂")
+F.sidebar_stats(st, [(f"{len(df):,}", "Tokyo listings"), (f"¥{df['price'].median():,.0f}", "median price a night, all listings"),
+                     (f"{df['neighbourhood_cleansed'].nunique()}", "neighbourhoods"),
+                     (f"{showcase.headline()['grounded_new']:.0%}", "fully grounded answers (gpt-6-luna)")])
+
 with st.sidebar:
-    st.markdown(":material/home: **Tokyo Airbnb**")
-    st.markdown("---")
-
-    # Icon-button navigation — Material icons (Streamlit 1.36+)
-    NAV_ITEMS = [
-        (":material/dashboard:",    "Dashboard"),
-        (":material/smart_toy:",    "AI Assistant"),
-        (":material/map:",          "Maps"),
-        (":material/table_chart:",  "Data Explorer"),
-        (":material/reviews:",      "Sentiment Analysis"),
-        (":material/manage_search:", "Data Discovery"),
-    ]
-    for icon, label in NAV_ITEMS:
-        is_active = st.session_state.page == label
-        if st.button(
-            label,
-            icon=icon,
-            key=f"nav_{label}",
-            use_container_width=True,
-            type="primary" if is_active else "secondary",
-        ):
-            st.session_state.page = label
-            st.rerun()
-
-    st.markdown("---")
     st.markdown('<p class="section-label">Filters</p>', unsafe_allow_html=True)
 
     price_cap = min(int(df["price"].quantile(0.98)), 200_000)
@@ -328,19 +323,26 @@ with st.sidebar:
         file_name=f"airbnb_tokyo_{pd.Timestamp.now().strftime('%Y%m%d')}.csv",
         mime="text/csv",
     )
-    st.markdown("---")
-    st.caption("Source: Inside Airbnb Tokyo")
-
-
-page = st.session_state.page
+F.sidebar_footer(st, {"Results page": showcase.PAGES, "Walkthrough": showcase.PAGES + "build.html", "Source": showcase.REPO},
+                 "Data: Inside Airbnb, Tokyo (CC BY 4.0). Recorded agent answers; no model runs unless you add your own key.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DASHBOARD
 # ═══════════════════════════════════════════════════════════════════════════════
-if page == "Dashboard":
+if page.key == "overview":
     import pyarrow.parquet as _pq
     showcase.render(st, len(df), _pq.ParquetFile("data/processed/reviews_processed.parquet").metadata.num_rows)
+    F.use_cards(st, PAGES)
+
+elif page.key == "explore":
+    _rt = filtered_df.groupby("room_type")["price"].median().sort_values(ascending=False)
+    _nb = filtered_df["neighbourhood_cleansed"].value_counts()
+    F.header(st, page, "What does a night in Tokyo cost, and where are the listings?",
+             (f"Median **¥{filtered_df['price'].median():,.0f}** a night across the {len(filtered_df):,} listings in view (mean "
+              f"¥{filtered_df['price'].mean():,.0f}, pulled up by expensive outliers). By room type the median runs from ¥{_rt.iloc[0]:,.0f} "
+              f"({_rt.index[0].lower()}) to ¥{_rt.iloc[-1]:,.0f} ({_rt.index[-1].lower()}); {_nb.index[0]} holds the most listings "
+              f"({_nb.iloc[0]:,}).") if len(filtered_df) else "No listing matches the sidebar filters.")
     st.subheader("Tokyo Airbnb Market")
     st.caption(f"Showing **{len(filtered_df):,}** of {len(df):,} listings")
 
@@ -350,7 +352,7 @@ if page == "Dashboard":
     c2.metric(
         "Average Price",
         f"¥{filtered_df['price'].mean():,.0f}",
-        delta=f"¥{filtered_df['price'].mean() - df['price'].mean():+,.0f} vs all",
+        delta=f"{'-' if filtered_df['price'].mean() < df['price'].mean() else '+'}¥{abs(filtered_df['price'].mean() - df['price'].mean()):,.0f} vs all",
     )
     c3.metric("Median Price", f"¥{filtered_df['price'].median():,.0f}")
     c4.metric("Neighbourhoods", filtered_df["neighbourhood_cleansed"].nunique())
@@ -553,10 +555,12 @@ if page == "Dashboard":
 # ═══════════════════════════════════════════════════════════════════════════════
 # AI ASSISTANT
 # ═══════════════════════════════════════════════════════════════════════════════
-elif page == "AI Assistant":
-    st.title("AI Assistant")
-    st.caption("Two agents: a data agent with tools over the listings, and cited answers from guest reviews. "
-               "Recorded answers by default; use your own OpenAI key to ask anything live.")
+elif page.key == "agent":
+    _rec = [json.loads((_P(__file__).resolve().parent / f).read_text())["runs"] for f in ["replays_data_agent.json", "replays_reviews.json"]]
+    F.header(st, page, "Can a host or analyst ask in plain words?",
+             f"Yes, two ways: a data agent with tools over the listings, and cited answers from 25,000 indexed reviews. "
+             f"{sum(r['grounded'] for x in _rec for r in x)} of {sum(len(x) for x in _rec)} recorded answers pass the number check. "
+             "Replay is free; with your own OpenAI key you can ask anything, 10 questions per session, and the key is never stored.")
     tab_chat, tab_rag = st.tabs(["Chat with the data agent", "Ask the reviews (RAG)"])
     with tab_chat:
         st.markdown("The agent picks tools (summary statistics, prices by neighbourhood or room type, review scores, recommendations, "
@@ -567,10 +571,16 @@ elif page == "AI Assistant":
                     "with a citation after each claim; chosen over gpt-4o-mini in a 300-question test (fully grounded 78% vs 1%, ADR-009).")
         chat.render(st, _P(__file__).resolve().parent / "replays_reviews.json", aha_agents.ReviewAgent, prefix="rag_")
 
-elif page == "Maps":
+elif page.key == "maps":
     from folium.plugins import HeatMap, MarkerCluster
 
-    st.title("Geospatial Map")
+    _nbm = filtered_df.groupby("neighbourhood_cleansed")["price"].agg(["median", "size"])
+    _big = _nbm[_nbm["size"] >= 50].sort_values("median", ascending=False)
+    F.header(st, page, "Where are the listings, and where do they cost the most?",
+             (f"{len(filtered_df):,} listings in {filtered_df['neighbourhood_cleansed'].nunique()} neighbourhoods. Among neighbourhoods with "
+              f"at least 50 listings, **{_big.index[0]}** has the highest median price (¥{_big['median'].iloc[0]:,.0f} a night) and "
+              f"{_big.index[-1]} the lowest (¥{_big['median'].iloc[-1]:,.0f}).") if len(_big) else
+             f"{len(filtered_df):,} listings in view; no neighbourhood has 50 or more listings under these filters.")
 
     # ── KPIs ───────────────────────────────────────────────────────────────────
     mc1, mc2, mc3 = st.columns(3)
@@ -589,8 +599,12 @@ elif page == "Maps":
         m = folium.Map(
             location=center,
             zoom_start=11,
-            tiles="CartoDB dark_matter",
+            tiles=None,
         )
+        folium.TileLayer(                                   # CARTO's dark tiles now need an API key; Esri's dark gray base does not
+            tiles="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+            attr="Tiles © Esri: Esri, HERE, Garmin, OpenStreetMap contributors", name="Dark base map",
+        ).add_to(m)
 
         # Layer 1 — Neighbourhood choropleth (avg price) with hover tooltip
         nb_avg = df.groupby("neighbourhood_cleansed")["price"].mean().reset_index()
@@ -811,8 +825,11 @@ elif page == "Maps":
 # ═══════════════════════════════════════════════════════════════════════════════
 # DATA EXPLORER
 # ═══════════════════════════════════════════════════════════════════════════════
-elif page == "Data Explorer":
-    st.title("Data Explorer")
+elif page.key == "data":
+    _miss = int((df.isna().mean() > 0).sum())
+    F.header(st, page, "Can I check the data before trusting a number?",
+             f"Yes: browse and filter the {len(filtered_df):,} listings in view, see any column's distribution, and where data is "
+             f"missing ({_miss} of {df.shape[1]} columns have gaps), then compare neighbourhoods side by side.")
 
     # ── Column selector ────────────────────────────────────────────────────────
     st.subheader("Browse Listings")
@@ -998,8 +1015,8 @@ elif page == "Data Explorer":
 # ═══════════════════════════════════════════════════════════════════════════════
 # SENTIMENT ANALYSIS
 # ═══════════════════════════════════════════════════════════════════════════════
-elif page == "Sentiment Analysis":
-    st.title("Review Sentiment")
+elif page.key == "sentiment":
+    _sent_head = st.container()                      # filled once the reviews are scored
 
     if not _TRANSLATION_AVAILABLE:
         st.warning(
@@ -1012,6 +1029,7 @@ elif page == "Sentiment Analysis":
         reviews = _sentiment_for_listings(_listing_ids)
 
     if len(reviews) == 0:
+        F.header(_sent_head, page, "How do guests feel about these listings?", "No reviews match the sidebar filters; broaden them.")
         st.info(
             "No reviews found for the current filter. "
             "Try broadening the price range, room type, or neighbourhood selection."
@@ -1020,14 +1038,19 @@ elif page == "Sentiment Analysis":
 
     _n_listings = len(filtered_df)
     st.caption(
-        f"TextBlob polarity scores on up to 5,000 reviews from the "
+        f"TextBlob polarity scores on up to 100,000 reviews (a random sample when more match) from the "
         f"**{_n_listings:,}** listings matching your current filters."
     )
 
+    F.header(_sent_head, page, "How do guests feel about these listings?",
+             f"Of {len(reviews):,} reviews scored for the listings in view, **{(reviews['sentiment_label'] == 'Positive').mean():.0%} read "
+             f"positive** and {(reviews['sentiment_label'] == 'Negative').mean():.0%} negative (TextBlob polarity above 0.1 or below −0.1). "
+             "The most positive and most negative reviews below show what drives each.")
     sc1, sc2, sc3 = st.columns(3)
     sc1.metric("Reviews Analysed", f"{len(reviews):,}")
     sc2.metric("Average Sentiment", f"{reviews['sentiment'].mean():.3f}")
-    sc3.metric("Positive Reviews", f"{(reviews['sentiment'] > 0).mean() * 100:.1f}%")
+    sc3.metric("Positive Reviews", f"{(reviews['sentiment_label'] == 'Positive').mean() * 100:.1f}%", "polarity above 0.1",
+               delta_color="off", delta_arrow="off")
 
     st.markdown("---")
 
@@ -1113,12 +1136,10 @@ elif page == "Sentiment Analysis":
 # ═══════════════════════════════════════════════════════════════════════════════
 # DATA DISCOVERY & INTEGRATION
 # ═══════════════════════════════════════════════════════════════════════════════
-elif page == "Data Discovery":
-    st.title("Intelligent Data Discovery & Integration")
-    st.caption(
-        "Phase 1 — auto-discover patterns, anomalies, and market gaps. "
-        "Phase 2 — upload an external dataset and merge it with the Airbnb data."
-    )
+elif page.key == "discovery":
+    F.header(st, page, "What patterns, anomalies and gaps are in the market right now?",
+             "Run the scan over the listings in view: price outliers, hidden gems, market gaps, feature correlations and availability "
+             "patterns, each explained in plain words from a template (no model runs here). Then merge your own dataset to enrich it.")
 
     if not _DISCOVERY_AVAILABLE:
         st.error(
@@ -1143,7 +1164,7 @@ elif page == "Data Discovery":
             st.caption(
                 "Scans all listings for price outliers, hidden gems, market gaps, "
                 "feature correlations, and availability patterns. "
-                "LLM narrates each finding in plain English."
+                "Each finding is written in plain English from a template; no model runs here."
             )
 
         if rerun_clicked:

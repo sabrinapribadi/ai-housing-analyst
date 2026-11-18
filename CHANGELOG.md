@@ -3,6 +3,14 @@
 Newest first. Each entry uses STAR (Situation, Task, Action, Result) so it can be told as a story.
 
 
+## [6.3.0] — 2026-11-18 — App template v2: Overview and Explore pages, a business question per page, no owner key
+**Files:** src/ui/dashboard.py, src/ui/showcase.py, src/ui/frame.py (new, shared), tests/test_streamlit_app.py, README.md
+- **Situation:** The user wanted every Streamlit app to combine the older dashboards' structure (sidebar pages: a real use case, EDA, an AI assistant; a business question on every view) with the newer apps' 5W1H brief and KPI first screen.
+- **Task:** Rebuild this app on one shared template (R26 item 8) and check every page against the data before release.
+- **Action:** Seven pages on the shared `frame.py`: the old Dashboard split into Overview (brief, KPIs) and Explore the market; each page's answer computed from the filtered data; the app drops any `OPENAI_API_KEY` at start, so data discovery narrates from templates.
+- **Result:** 8 app tests pass. Checking the pages fixed the map's base layer (CARTO's dark tiles now need an API key; Esri's dark gray base does not), a sentiment caption ('up to 5,000' reviews; 100,000 are scored), two different 'positive' shares, and an up arrow on a negative price difference.
+- **Talking point:** "Every portfolio app now reads the same way: what it is for, the data, the use case, then an assistant; and every page answers a business question from the data."
+
 ## [6.2.1] — 2026-11-18 — App live on Streamlit; Streamlit floor matches what the app uses
 **Files:** docs/brief.yaml, README.md, docs/index.html, docs/build.html, requirements.txt, pyproject.toml, poetry.lock
 - **Situation:** The app was deployed on Streamlit Community Cloud; the brief did not link to it, and requirements allowed Streamlit 1.37, which lacks `st.metric(delta_arrow=...)` used on the first screen.

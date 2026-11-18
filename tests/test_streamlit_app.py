@@ -23,7 +23,14 @@ def _repo_cwd(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
 
-def app(page="Dashboard", **state):
+PAGES = ["overview", "explore", "maps", "data", "sentiment", "discovery", "agent"]
+
+
+def body(at) -> str:
+    return " ".join(e.proto.body for e in at.get("html"))
+
+
+def app(page="overview", **state):
     at = AppTest.from_file(APP, default_timeout=180)
     at.session_state["page"] = page
     for k, v in state.items():
@@ -39,6 +46,21 @@ def test_first_screen_has_results_and_brief():
     assert [m.value for m in at.metric][:2] == [f"{h['ndcg_after']:.3f}", f"{h['grounded_new']:.0%}"]
     assert [m.value for m in at.metric][2:4] == ["27,945", "444,182"]
     assert any("12 hours" in c.value for c in at.caption)
+    for w in ["What", "Why", "Who", "Where", "When it fails", "How"]:          # the 5W1H brief (R22)
+        assert f'class="f-w">{w}<' in body(at), w
+    assert [b.key for b in at.sidebar.button] == [f"nav_{k}" for k in PAGES]
+
+
+def test_every_page_opens_with_its_business_question():
+    for key in PAGES[1:]:
+        assert "Business question" in body(app(key)), key
+
+
+def test_owner_key_is_dropped_at_start(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk" + "-" + "owner-key-must-not-be-used")   # fake, built at runtime
+    app("discovery")
+    import os
+    assert os.environ.get("OPENAI_API_KEY") is None
 
 
 @pytest.mark.parametrize("name,agent", [("data_agent", aha_agents.DataAgent), ("reviews", aha_agents.ReviewAgent)])
@@ -53,7 +75,7 @@ def test_replays_recorded_grounded_and_keyless(name, agent):
 
 
 def test_replay_both_surfaces_without_a_key():
-    at = app("AI Assistant")
+    at = app("agent")
     assert at.radio(key="data_chat_mode").value.startswith("Replay") and at.radio(key="rag_chat_mode").value.startswith("Replay")
     d = json.loads((UI / "replays_data_agent.json").read_text())["runs"][1]
     at.selectbox(key="data_replay_pick").set_value(d["question"]).run()
@@ -74,10 +96,16 @@ def test_live_mode_uses_viewer_key_and_never_echoes_it(monkeypatch):
                 "grounded": True, "ungrounded_numbers": [], "model": "stub", "tokens": {"input": 1, "cached_input": 0, "output": 1},
                 "cost_usd": 0.0, "latency_ms": 1.0}
     monkeypatch.setattr(aha_agents.DataAgent, "live", staticmethod(fake))
-    at = app("AI Assistant")
+    at = app("agent")
     at.radio(key="data_chat_mode").set_value("Live: use your own OpenAI key").run()
     at.text_input(key="data_byo_key").input(key).run()
     at.chat_input(key="data_live_input").set_value("Anything").run()
     assert seen["key"] == key and any("Live answer." in m.value for m in at.markdown)
     assert key not in " ".join(m.value for m in at.markdown)
     assert A.redact(f"Incorrect API key provided: {key}", key) == "Incorrect API key provided: [your key]"
+
+
+def test_frame_is_the_shared_copy():
+    """The app frame is identical in every portfolio app; change it everywhere at once (checksum of the shared copy)."""
+    import hashlib
+    assert hashlib.sha256((UI / "frame.py").read_bytes()).hexdigest()[:16] == "385e92329f20405a"
