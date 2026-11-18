@@ -21,7 +21,7 @@ plotly = "^5.22.0"
 langchain = "^0.3.0"
 langchain-openai = "^0.2.0"
 openai = "^1.40.0"
-streamlit = "^1.37.0"
+streamlit = "^1.58.0"
 python-dotenv = "^1.0.0"
 jupyter = "^1.1.1"
 

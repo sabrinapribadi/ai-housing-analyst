@@ -8,7 +8,7 @@
 2. **Why:** Hosts and analysts want prices, gaps and guest sentiment by neighbourhood without writing queries.
 3. **Who:** Users: hosts, investors and market analysts.
    - Data: Inside Airbnb Tokyo, 27,945 listings and 444,182 reviews.
-4. **Where:** [Results page](https://sabrinapribadi.github.io/ai-housing-analyst/) and [technical walkthrough](https://sabrinapribadi.github.io/ai-housing-analyst/build.html) on GitHub Pages.
+4. **Where:** [Results page](https://sabrinapribadi.github.io/ai-housing-analyst/) and [technical walkthrough](https://sabrinapribadi.github.io/ai-housing-analyst/build.html) on GitHub Pages; [interactive app](https://ai-housing-analyst-gvtqlzoundrzjefemb4bbf.streamlit.app/) on Streamlit.
    - Streamlit app: recorded agent answers by default; a viewer can use their own OpenAI key to ask live.
 5. **When it fails:** A hallucination suite asks the live agent 6 questions and checks each number against the data: 0 hallucinations in the recorded run.
    - Pre-registered study on 300 questions: a reranked review search lifts nDCG@10 from 0.46 to 0.55 (passed); a LoRA-tuned Qwen3-1.7B on vLLM failed all three gates against gpt-6-luna.
@@ -129,7 +129,7 @@ python scripts/save_processed_data.py
 
 ## Try it interactively (Streamlit app)
 
-Entry point `src/ui/dashboard.py` (rule R26); deploy on Streamlit Community Cloud from `main`, no secrets needed.
+**Live:** [ai-housing-analyst on Streamlit](https://ai-housing-analyst-gvtqlzoundrzjefemb4bbf.streamlit.app/). Entry point `src/ui/dashboard.py` (rule R26), deployed on Streamlit Community Cloud from `main` with no secrets.
 
 1. **First screen:** headline results from committed files (search nDCG@10 0.545, was 0.459; fully grounded answers 78%, previous model 1%), the brief and links.
 2. **AI Assistant, replay by default:** 6 data-agent and 6 review answers recorded from the real agents (`src/ui/replays_*.json`, made by `scripts/record_app_replays.py`), each with its tool calls, charts, cited reviews, a number check (12 of 12 pass), cost and time.
@@ -208,7 +208,7 @@ textColor                = "#F0F0F0"
 
 | Layer           | Library / Tool                                                            |
 |-----------------|---------------------------------------------------------------------------|
-| Frontend        | Streamlit 1.58, Material Icons                                            |
+| Frontend        | Streamlit 1.58+, Material Icons                                           |
 | Charts          | Plotly Express / Graph Objects                                            |
 | Maps            | Folium, streamlit-folium, folium.plugins (HeatMap, MarkerCluster)         |
 | Icons           | Streamlit Material icons (:material/\*), inline SVG for Folium popups     |

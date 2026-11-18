@@ -2,6 +2,14 @@
 
 Newest first. Each entry uses STAR (Situation, Task, Action, Result) so it can be told as a story.
 
+
+## [6.2.1] — 2026-11-18 — App live on Streamlit; Streamlit floor matches what the app uses
+**Files:** docs/brief.yaml, README.md, docs/index.html, docs/build.html, requirements.txt, pyproject.toml, poetry.lock
+- **Situation:** The app was deployed on Streamlit Community Cloud; the brief did not link to it, and requirements allowed Streamlit 1.37, which lacks `st.metric(delta_arrow=...)` used on the first screen.
+- **Task:** Link the live app and make the stated Streamlit floor one the app actually runs on.
+- **Action:** Added the app link to the brief (README, results page, walkthrough) and the README app section; raised the floor to 1.58 (the locked version, checked to have `delta_arrow`) in requirements and pyproject; lock re-hashed only.
+- **Result:** Live app linked from every brief; a fresh install can no longer pick a Streamlit that crashes the first screen.
+
 ## [6.2.0] — 2026-11-18 — Streamlit app without a key: replay by default, the viewer's own key optional (R26)
 **Files:** src/ui/dashboard.py, src/ui/showcase.py (new), src/ui/aha_agents.py (new), src/ui/agent.py and src/ui/chat.py (new, shared with the other portfolio apps), src/ui/replays_data_agent.json, src/ui/replays_reviews.json, src/ui/replay_plots/ (new), src/agent/agent.py, scripts/record_app_replays.py (new), tests/test_streamlit_app.py (new), .github/workflows/ci.yml, docs/brief.yaml, README.md, docs/index.html
 - **Situation:** The app's AI Assistant stopped without the owner's OpenAI key in Streamlit secrets, against R26 (no keys), so it was never deployed.

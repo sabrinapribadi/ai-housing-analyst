@@ -13,7 +13,7 @@ brief:
       - "Data: Inside Airbnb Tokyo, 27,945 listings and 444,182 reviews."
   - w: Where
     lines:
-      - "[Results page](https://sabrinapribadi.github.io/ai-housing-analyst/) and [technical walkthrough](https://sabrinapribadi.github.io/ai-housing-analyst/build.html) on GitHub Pages."
+      - "[Results page](https://sabrinapribadi.github.io/ai-housing-analyst/) and [technical walkthrough](https://sabrinapribadi.github.io/ai-housing-analyst/build.html) on GitHub Pages; [interactive app](https://ai-housing-analyst-gvtqlzoundrzjefemb4bbf.streamlit.app/) on Streamlit."
       - "Streamlit app: recorded agent answers by default; a viewer can use their own OpenAI key to ask live."
   - w: When it fails
     lines:
